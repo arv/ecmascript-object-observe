@@ -62,7 +62,7 @@ An observation is conceptually a tuple: <observed object, observer function, acc
 
 The [[harmony:observe_internals#notifierprototype_.performchange|performChange()]] method of an object's associated Notifier provides a mechanism to describe a set of changes as a single (more compact) higher-level change type.
 
-The set of change types being performed on an object is represented in the set of properties of the Notifier's %%[[ActiveChanges]]%% map whose value is positive. The count of active change types in ActiveChanges is affected by performChange() running [[harmony:observe_internals#beginchange|BeginChange]] before, and [[harmony:observe_internals#endchange|EndChange]] after invoking the provided changeFn function.
+The set of change types being performed on an object is represented in the set of properties of the Notifier's `[[ActiveChanges]]` map whose value is positive. The count of active change types in ActiveChanges is affected by performChange() running [[harmony:observe_internals#beginchange|BeginChange]] before, and [[harmony:observe_internals#endchange|EndChange]] after invoking the provided changeFn function.
 
 ## Enqueuing changes to observers
 
