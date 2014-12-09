@@ -3,50 +3,50 @@
 ## Object.observe
 
 A new function Object.observe(O, callback, accept) is added, which behaves as follows:
-  - If Type(//O//) is not Object, throw a TypeError exception.
-  - If IsCallable(//callback//) is **false**, throw a TypeError exception.
-  - If IsFrozen(//callback//) is **true**, throw a TypeError exception.
-  - If //accept// is **undefined**
-    - Let //acceptList// be a new List containing ["add", "update", "delete", "reconfigure", "setPrototype", "preventExtensions"]
+  - If Type(_O_) is not Object, throw a TypeError exception.
+  - If IsCallable(_callback_) is **false**, throw a TypeError exception.
+  - If IsFrozen(_callback_) is **true**, throw a TypeError exception.
+  - If _accept_ is **undefined**
+    - Let _acceptList_ be a new List containing ["add", "update", "delete", "reconfigure", "setPrototype", "preventExtensions"]
   - Else:
-    - Let //acceptList// be a new List.
-    - If Type(//accept//) is not Object, throw a TypeError exception.
-    - Let //lenValue// be the result of Get(//accept//, "length")
-    - Let //len// be ToLength(//lenValue//).
-    - ReturnIfAbrupt(//len//).
-    - Let //nextIndex// be 0.
-    - Repeat while //nextIndex// < //len//
-      - Let //next// be the result of Get(//accept//, ToString(//nextIndex//)).
-      - Let //nextString// be ToString(//next//).
-      - ReturnIfAbrupt(//nextString//).
-      - Append //nextString// to //acceptList//.
-      - Let //nextIndex// be //nextIndex// + 1.
-  - Let //notifier// be the result of calling %%[[GetNotifier]]%%, passing //O//.
-  - Let //changeObservers// be %%[[ChangeObservers]]%% of //notifier//.
-  - If //changeObservers// already contains a //record// whose //callback// property is the same as //callback//, then
-    - Perform CreateOwnDataProperty(//record//, "accept", //acceptList//) and
-    - Return //O//.
-  - Let //observerRecord// be the result of performing ObjectCreate().
-  - Perform CreateOwnDataProperty(//observerRecord//, "callback", //callback//).
-  - Perform CreateOwnDataProperty(//observerRecord//, "accept", //acceptList//).
-  - Append //observerRecord// to the end of the //changeObservers// list.
-  - Let //observerCallbacks// be %%[[ObserverCallbacks]]%%.
-  - If //observerCallbacks// already contains //callback//, return //O//.
-  - Append //callback// to the end of the //observerCallbacks// list.
-  - Return //O//.
+    - Let _acceptList_ be a new List.
+    - If Type(_accept_) is not Object, throw a TypeError exception.
+    - Let _lenValue_ be the result of Get(_accept_, "length")
+    - Let _len_ be ToLength(_lenValue_).
+    - ReturnIfAbrupt(_len_).
+    - Let _nextIndex_ be 0.
+    - Repeat while _nextIndex_ < _len_
+      - Let _next_ be the result of Get(_accept_, ToString(_nextIndex_)).
+      - Let _nextString_ be ToString(_next_).
+      - ReturnIfAbrupt(_nextString_).
+      - Append _nextString_ to _acceptList_.
+      - Let _nextIndex_ be _nextIndex_ + 1.
+  - Let _notifier_ be the result of calling `[[GetNotifier]]`, passing _O_.
+  - Let _changeObservers_ be `[[ChangeObservers]]` of _notifier_.
+  - If _changeObservers_ already contains a _record_ whose _callback_ property is the same as _callback_, then
+    - Perform CreateOwnDataProperty(_record_, "accept", _acceptList_) and
+    - Return _O_.
+  - Let _observerRecord_ be the result of performing ObjectCreate().
+  - Perform CreateOwnDataProperty(_observerRecord_, "callback", _callback_).
+  - Perform CreateOwnDataProperty(_observerRecord_, "accept", _acceptList_).
+  - Append _observerRecord_ to the end of the _changeObservers_ list.
+  - Let _observerCallbacks_ be `[[ObserverCallbacks]]`.
+  - If _observerCallbacks_ already contains _callback_, return _O_.
+  - Append _callback_ to the end of the _observerCallbacks_ list.
+  - Return _O_.
 
 
 
 ## Object.unobserve
 
 A new function Object.unobserve(O, callback) is added, which behaves as follows:
-  - If Type(//O//) is not Object, throw a TypeError exception.
-  - If IsCallable(//callback//) is not **true**, throw a TypeError exception.
-  - Let //notifier// be the result of calling %%[[GetNotifier]]%%, passing //O//.
-  - Let //changeObservers// be %%[[ChangeObservers]]%% of //notifier//.
-  - If //changeObservers// does not contain a record whose //callback// property is the same as //callback//, return //O//.
-  - Remove the record whose //callback// property is the same as //callback// from the //changeObservers// list.
-  - Return //O//.
+  - If Type(_O_) is not Object, throw a TypeError exception.
+  - If IsCallable(_callback_) is not **true**, throw a TypeError exception.
+  - Let _notifier_ be the result of calling `[[GetNotifier]]`, passing _O_.
+  - Let _changeObservers_ be `[[ChangeObservers]]` of _notifier_.
+  - If _changeObservers_ does not contain a record whose _callback_ property is the same as _callback_, return _O_.
+  - Remove the record whose _callback_ property is the same as _callback_ from the _changeObservers_ list.
+  - Return _O_.
 
 
 
@@ -77,8 +77,8 @@ function(O, callback) {
 ## Object.deliverChangeRecords
 
 A new function Object.deliverChangeRecords(callback) is added, which behaves as follows:
-  - If IsCallable(//callback//) is not **true**, throw a TypeError exception.
-  - Call %%[[DeliverChangeRecords]]%% with arguments: //callback// repeatedly until it returns false (no records were pending for delivery and callback no invoked).
+  - If IsCallable(_callback_) is not **true**, throw a TypeError exception.
+  - Call `[[DeliverChangeRecords]]` with arguments: _callback_ repeatedly until it returns false (no records were pending for delivery and callback no invoked).
   - Return.
 
 
@@ -86,6 +86,6 @@ A new function Object.deliverChangeRecords(callback) is added, which behaves as 
 
 A new function Object.getNotifier(O) is added, which behaves as follows:
 
-  - If Type(//O//) is not Object, throw a TypeError exception.
-  - If //O// is frozen, return **''null''**.
-  - Return the result of calling %%[[GetNotifier]]%%, passing //O//.
+  - If Type(_O_) is not Object, throw a TypeError exception.
+  - If _O_ is frozen, return **''null''**.
+  - Return the result of calling `[[GetNotifier]]`, passing _O_.
