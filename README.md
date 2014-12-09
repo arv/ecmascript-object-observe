@@ -81,4 +81,4 @@ Object.observe is a relatively significant and cross-cutting feature, as it
 
 ## Modifications to Existing Internal Algorithms
 
-[Changes to the existing specification](ChangesToTtheExistingSpecification.md)
+[Changes to the existing specification](ChangesToTheExistingSpecification.md)
