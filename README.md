@@ -4,7 +4,7 @@
 
 ## Updates
 
-[Updates](harmony:observe_updates)
+[Updates](Updates.md)
 
 
 
@@ -61,24 +61,24 @@ Object.observe is a relatively significant and cross-cutting feature, as it
 
 ## API Usage Examples
 
-[Usage Examples](harmony:observe_api_usage)
+[Usage Examples](UsageExamples.md)
 
 
 
 ## Key Algorithms and Semantics
 
-[Key Algorithms and Semantics](harmony:observe_overview)
+[Key Algorithms and Semantics](KeyAlgorithmsAndSemantics.md)
 
 ## New Internal Properties, Objects and Algorithms
 
-[New internals specification](harmony:observe_internals)
+[New internals specification](NewInternalsSpecification.md)
 
 ## New Public API
 
-[Public API Specification](harmony:observe_public_api)
+[Public API Specification](PublicApiSpecification.md)
 
 
 
 ## Modifications to Existing Internal Algorithms
 
-(Changes to the existing specification)[harmony:observe_spec_changes]
+[Changes to the existing specification][ChangesToTtheExistingSpecification.md]
