@@ -1,0 +1,72 @@
+# Object.observe: Updates
+
+11/14/2013:
+  - Re-organized structure.
+  - Added "Key Algorithms and Semantics" section.
+  - Added "Cross-cutting Concerns and Potential Implementation Challenges"
+11/13/2013:
+  - Fixed a bunch of editorial issues discovered by Joshua Bell.
+  - Rebase spec changes against Rev21 ES6 Draft
+10/29/2013:
+  - notifier.performChange now emits a change record if the return value of the changeFn is an object (feedback from Sept TC-39)
+  - "intrinsic" change record types renamed for consistency. "new" -> "add", "updated" -> "update", "deleted" -> "delete", "reconfigured" -> "reconfigure", "prototype" -> "setPrototype" (feedback from Sept TC-39)
+  - "preventExtensions" changeRecord type is now emitted when the first time an object's %%[[Extensible]]%% internal property is set to false.
+9/12/2013:
+  - Object.observe accept arg can be zero-length (now specifies that accept.length must be > 0).
+7/20/2013:
+  - Notifier.performChange, Array.observe & some refactoring of algorithms.
+1/30/2013:
+  - Suppress oldValue when the changeRecord is of type 'reconfigured' and the oldValue and present value are the same. Note that CreateChangeRecord now takes both oldDesc and newDesc as arguments.
+12/21/2012:
+  - Object.deliverChangeRecords now calls %%[[DeliverChangeRecords]]%% repeatedly until there no pending records to deliver.
+11/19/2012:
+  - Object.observer/unobserve now return the object (for consistency with Object.freeze, etc...).
+11/13/2012:
+  - In Object.unobserve, passing a non-function as the callback now throws (for symmetry with Object.observe).
+
+10/28/2012:
+  - In CreateChangeRecord, renamed fourth argument to "oldDesc" (from "desc") for clarity.
+  - In CreateChangeRecord, shallow freeze created changeRecord (consistent with Notifier.prototype.notify).
+
+10/23/2012:
+  - In notify, moved the check for type not being a string above the check for empty observers so the error will throw regardless of if there are observers.
+  - Change the spec language of notify to make it clear to return before creating the changeRecord if there are no observers.
+
+9/11/2012:
+  - Added a section that we need to schedule a ''{type: "**prototype**", object: ..., oldValue: ...}'' change record when the %%[[Prototype]]%% internal property is changed.
+
+7/18/2012:
+  - Only fire **''"updated"''** changes when value changes (using SameValue) and no other configuration change happens.
+
+7/17/2012: Based on feedback from Mark Miller, Tom van Cutsem and Andreas Rossberg:
+  - //anyWorkDone// should be or'ed with the previous value.
+  - Refactored into %%[[GetNotifier]]%% to ensure it is always initialized.
+  - **''"descriptor"''** is now always **''"reconfigured"''**
+  - Enforce that //changeRecord// is frozen in %%[[NotifierPrototype]]%%.notify.
+  - Never pass a descriptor in the change record. Only include oldValue if it was a data property before the change.
+  - Remove redundant IsCallable check in unobserve.
+  - Ensure that //O// is an object in Object.getNotifier.
+  
+
+7/4/2012: Per security feedback from Mark Miller
+  - Object.getNotifier() of frozen object, returns null.
+  - Object %%[[Notifier]]%% is spec'd to be lazily created to avoid infinite regress.
+  - All changeRecords are shallowly frozen, and "reconfigured" changeRecords have their oldValue (property descriptor) frozen.
+  - Validate **''"object"''** field of //changeRecord// for //notifyFunction// so as to ensure that notifier of an object can only broadcast changes of its %%[[Target]]%%.
+  - Validate **''"type"''** and **''"name"''** fields of //changeRecord// for //notifyFunction// and perform a shallow freeze to prevent unintentional delivery of shared mutable state.
+  - Object.retrieveChangeRecords -> Object.deliverChangeRecords (invoke the function rather than return records).
+  - Object callbacks invokations silently ignore all thrown exceptions and return values.
+  - Frozen callback function objects cannot be registered as change observers (Object.observe) throws TypeError.
+
+7/2/2012:
+  - Remove changeRecord validation. Since there is no way to validate "oldValue", arbitrary data can always be passed.
+  - Added Object.getNotifier(obj).notify(changeRecord) separation, so as to allow freezing of an object to prevent side-channel, but retaining the ability to notify if getNotifier() was called prior to freezing.
+
+5/17/2012:
+  - Call the callbacks with a ChangeRecord object describing the change.
+  - Add sanity checks in %%[[ToChangeRecord]]%% which is used in ''Object.notifyObservers''.
+  - Add ''Object.retrieveChangeRecords'' which allows synchronous access to the pending changes.
+
+3/16/2012:  Two requests from feedback from Rafael Weinstein and Erik Arvidsson:
+  - Pass old property values as well as new to %%[[FireChangeListeners]]%%
+  - Schedule change events to be delivered asynchronously "at the end of the turn"   
