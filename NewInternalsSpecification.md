@@ -108,6 +108,7 @@ When the abstract operation BeginChange is called with Object _O_ and string _ch
   1. Let _notifier_ be GetNotifier(_O_).
   1. Let _activeChanges_ be the value of _notifier_'s [[ActiveChanges]] internal slot.
   1. Let _changeCount_ be Get(_activeChanges_, _changeType_).
+  1. ReturnIfAbrubt(_changeCount_).
   1. If _changeCount_ is **undefined**, let _changeCount_ be 1.
   1. Else, let _changeCount_ be _changeCount_ + 1.
   1. Let _success_ be CreateDataProperty(_activeChanges_, _changeType_, _changeCount_).
@@ -115,18 +116,20 @@ When the abstract operation BeginChange is called with Object _O_ and string _ch
 
 
 
-### [[EndChange]]
+### EndChange(O, changeType)
 
-There is now a [[EndChange]] internal algorithm:
+When the abstract operation EndChange is called with Object _O_ and string _changeType_ the following steps are taken:
 
-?.??.?? [[EndChange]] (O, changeType)
-
-  - Let _notifier_ be the result of calling [[GetNotifier]] passing _O_.
-  - Let _activeChanges_ be [[ActiveChanges]] of _notifier_.
-  - Let _changeCount_ be Get(_activeChanges_, _changeType_).
-  - Assert: _changeCount_ > 0.
-  - Let _changeCount_ be _changeCount_ - 1.
-  - Perform CreateOwnDataProperty(_activeChanges_, _changeType_, _changeCount_).
+  1. Assert: Type(_O_) is Object.
+  1. Assert: Type(_changeType_) is String.
+  1. Let _notifier_ be GetNotifier(_O_).
+  1. Let _activeChanges_ be the value of _notifier_'s [[ActiveChanges]] internal slot.
+  1. Let _changeCount_ be Get(_activeChanges_, _changeType_).
+  1. ReturnIfAbrubt(_changeCount_).
+  1. Assert: _changeCount_ > 0.
+  1. Let _changeCount_ be _changeCount_ - 1.
+  1. Let _success_ be CreateDataProperty(_activeChanges_, _changeType_, _changeCount_).
+  1. Assert: _success_ is **true**.
 
 
 
@@ -141,6 +144,7 @@ When the abstract operation ShouldDeliverToObserver is called with Object _activ
   1. Let _doesAccept_ be **false**.
   1. For each _accept_ in _acceptList_, do
     1. Let _activeChangeCount_ be Get(_activeChanges_, _accept_).
+    1. ReturnIfAbrupt(_activeChangeCount_).
     1. If _activeChangeCount_ > 0, return **false**.
     1. If _accept_ is same string as _changeType_, then
       1. Let _doesAccept_ be **true**  .
@@ -153,15 +157,19 @@ When the abstract operation ShouldDeliverToObserver is called with Object _activ
 
 When the abstract operation EnqueueChangeRecord is called with Object _O_ and change record _changeRecord_ the following steps are taken:
 
+  1. Assert: Type(_O_) is Object.
   1. Let _notifier_ be GetNotifier(_O_).
   1. Let _changeType_ be  Get(_changeRecord_, `"type"`).
+  1. ReturnIfAbrupt(_changeType_).
   1. Let _activeChanges_ be the value of _notfier_'s [[ActiveChanges]] internal slot.
   1. Let _changeObservers_ be the value of _notifier_'s [[ChangeObservers]] internal slot.
   1. For each _observerRecord_ in _changeObservers_, do
     1. Let _acceptList_ be Get(_observerRecord_, `"accept"`).
+    1. ReturnIfAbrupt(_acceptList_).
     1. Let _deliver_ be ShouldDeliverToObserver(_activeChanges_, _acceptList_, _changeType_).
     1. If _deliver_ is **false**, continue.
     1. Otherwise, let _observer_ be Get(_observerRecord_, `"callback"`).
+    1. ReturnIfAbrupt(_observer_).
     1. Let _pendingRecords_ be the value of _observer_'s [[PendingChangeRecords]] internal slot.
     1. Append _changeRecord_ to the end of _pendingRecords_.
 
