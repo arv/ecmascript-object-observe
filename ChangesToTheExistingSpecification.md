@@ -108,27 +108,38 @@ When the [[PreventExtensions]] internal method of _O_ is called the following st
 
 When the [[SetPrototypeOf]] internal method of _O_ is called with argument _V_ the following steps are taken:
 
-  - Assert: Either Type(_V_) is Object or Type(_V_) is Null.
-  - Let _extensible_ be the value of the [[Extensible]] internal data property of _O_.
-  - Let _current_ be the value of the [[Prototype]] internal data property of _O_.
-  - If SameValue(_V_, _current_), then return true.
-  - If _extensible_ is false, then return false.
-  - If _V_ is not null, then
-    - Let _p_ be _V_.
-    - Repeat, while _p_ is not null
-      - If SameValue(_p_, _O_) is true, then return false.
-      - Let _nextp_ be the result of calling the [[GetPrototypeOf]] internal method of _p_ with no arguments.
-      - ReturnIfAbrupt(_nextp_).
-      - Let _p_ be _nextp_.
-  - Set the value of the [[Prototype]] internal data property of _O_ to _V_.
-  - __Let _notifier_ be the result of calling [[GetNotifier]], passing _O_.__
-  - __Let _R_ be the result of the abstraction operation ObjectCreate (15.2).__
-  - __Call the [[DefineOwnProperty]] internal method of _R_ with arguments **''"type"''**, Property Descriptor {[[Value]]: **''"setPrototype"''**, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.__
-  - __Call the [[DefineOwnProperty]] internal method of _R_ with arguments **''"object"''**, Property Descriptor {[[Value]]: _O_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.__
-  - __Call the [[DefineOwnProperty]] internal method of _R_ with arguments **''"oldValue"''**, Property Descriptor {[[Value]]: _current_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.__
-  - __Set the [[Extensible]] internal property of _R_ to false.__
-  - __Call [[EnqueueChangeRecord]] on passing _O_ and _R_.__
-  - Return true.
+  1. Assert: Either Type(_V_) is Object or Type(_V_) is Null.
+  1. Let _extensible_ be the value of the [[Extensible]] internal slot of _O_.
+  1. Let _current_ be the value of the [[Prototype]] internal slot of _O_.
+  1. If SameValue(_V_, _current_), then return **true**.
+  1. If _extensible_ is **false**, then return **false**.
+  1. If _V_ is not **null**, then
+    1. Let _p_ be _V_.
+    1. Repeat, while _p_ is not **null**
+      1. If SameValue(_p_, _O_) is **true**, then return **false**.
+      1. Let _nextp_ be the result of calling the [[GetPrototypeOf]] internal method of _p_ with no arguments.
+      1. ReturnIfAbrupt(_nextp_).
+      1. Let _p_ be _nextp_.
+  1. Let _extensible_ be the value of the [[Extensible]] internal slot of _O_.
+  1. If _extensible_ is **false**, then
+    1. Let _current2_ be the value of the [[Prototype]] internal slot of _O_.
+    1. If SameValue(_V_, _current2_) is **true**, then return **true**.
+    1. Return **false**.
+  1. Set the value of the [[Prototype]] internal slot of _O_ to _V_.
+  1. __Let _notifier_ be GetNotifier(_O_).__
+  1. __Let _R_ be ObjectCreate(%ObjectPrototype%).__
+  1. __Let _desc_ be the PropertyDescriptor{[[Value]]: `"setPrototype"`, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.__
+  1. __Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _R_ passing `"type"` and _desc_ as arguments.__
+  1. __Assert: _success_ is **true**.__
+  1. __Let _desc_ be the PropertyDescriptor{[[Value]]: _O_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.__
+  1. __Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _R_ passing `"object"` and _desc_ as arguments.__
+  1. __Assert: _success_ is **true**.__
+  1. __Let _desc_ be the PropertyDescriptor{[[Value]]: _current_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.__
+  1. __Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _R_ passing `"oldValue"` and _desc_ as arguments.__
+  1. __Assert: _success_ is **true**.__
+  1. __Set the [[Extensible]] internal slot of _R_ to **false**.__
+  1. __Call EnqueueChangeRecord(_O_, _R_).__
+  1. Return **true**.
 
 
 ## Changes to Array methods
