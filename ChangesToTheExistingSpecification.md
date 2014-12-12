@@ -25,7 +25,7 @@ NOTE: If undefined is passed as the O argument only validation is performed and 
       - If _O_ is not **undefined**, then create an own data property named _P_ of object _O_ whose [[Value]], [[Writable]], [[Enumerable]] and [[Configurable]] attribute values are described by Desc. If the value of an attribute field of Desc is absent, the attribute of the newly created property is set to its default value.
     - Else Desc must be an accessor Property Descriptor,
       - If O is not undefined, then create an own accessor property named P of object O whose [[Get]], [[Set]], [[Enumerable]] and [[Configurable]] attribute values are described by Desc. If the value of an attribute field of Desc is absent, the attribute of the newly created property is set to its default value.
-    - __Let _R_ be CreateChangeRecord`"add"`, _O_, _P_, _current_, _Desc_).__
+    - __Let _R_ be CreateChangeRecord(`"add"`, _O_, _P_, _current_, _Desc_).__
     - __Call EnqueueChangeRecord(_O_, _R_).__
     - Return true.
   - Return true, if every field in Desc is absent.
