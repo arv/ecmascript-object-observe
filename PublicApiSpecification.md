@@ -91,4 +91,4 @@ When the `getNotifier` method is called with argument _O_, the following steps a
 
   - If Type(_O_) is not Object, throw a **TypeError** exception.
   - If _O_ is frozen, return **null**.
-  - Return the result of calling [[GetNotifier]], passing _O_.
+  - Return the result of calling GetNotifier(_O_).
