@@ -9,7 +9,7 @@ Note: This list is used to provide a deterministic ordering in which callbacks a
 
 ## [[PendingChangeRecords]]
 
-Every function now has a [[PendingChangeRecords]] internal property which is an ordered list of ChangeRecords.
+Every function now has a [[PendingChangeRecords]] internal slot which is an ordered list of ChangeRecords.
 It is initially empty.
 
 Note: This list gets populated with change records as the objects that this function is observing are mutated. It gets emptied when the change records are delivered.
@@ -18,9 +18,9 @@ Note: This list gets populated with change records as the objects that this func
 
 ### [[Notifier]]
 
-Every object _O_ now has a [[Notifier]] internal property which is initially **''undefined''**.
+Every object _O_ now has a [[Notifier]] internal slot which is initially **''undefined''**.
 
-Note: This gets lazily initialized to a notifier object which is an object with the [[NotifierPrototype]] as its [[Prototype]].
+Note: This gets lazily initialized to a notifier object which is an object with the %NotifierPrototype% as its [[Prototype]].
 
 ## Notifier Objects
 
@@ -36,7 +36,7 @@ All Notifier Objects inherit properties from the %NotifierPrototype% intrinsic o
 
   1. Let _O_ be the **this** value.
   1. If Type(_O_) is not Object, throw a **TypeError** exception.
-  1. If _O_ does not have an internal property [[Target]] return.
+  1. If _O_ does not have a [[Target]] internal slot return.
   1. Let _type_ be Get(_changeRecord_, `"type"`).
   1. ReturnIfAbrubt(_type_).
   1. If Type(_type_) is not string, throw a **TypeError** exception.
@@ -57,35 +57,38 @@ All Notifier Objects inherit properties from the %NotifierPrototype% intrinsic o
   1. Call EnqueueChangeRecord(_target_, _newRecord_).
 
 
-### [[NotifierPrototype]].performChange
+### %NotifierPrototype%.performChange(changeType, changeFn)
 
-The performChange function of the [[NotifierPrototype]] is defined as follows:
-
-Let _performChange_ be a function, which when invoked does the following:
-  - Let _changeType_ be the first argument to the function.
-  - Let _changeFn_ be the second argument to the function.
-  - Let _notifier_ be [[This]].
-  - If Type(_notifier_) is not Object, throw a **''TypeError''** exception.
-  - If _notifier_ does not have an internal property [[Target]], return.
-  - Let _target_ be the internal property [[Target]] of _notifier_
-  - If Type(_changeType_) is not string, throw a **''TypeError''** exception.
-  - If IsCallable(_changeFn_) is not **true**, throw a **''TypeError''** exception.
-  - Call the [[BeginChange]] internal method with _target_ and _changeType_.
-  - Let _changeRecord_ be the return value of calling the [[Call]] internal method of _changeFn_, passing **undefined** as the _this_ parameter with no arguments. Let _error_ be any thrown exception.
-  - Call the [[EndChange]] internal method with _target_ and _changeType_.
-  - If _error_ is defined, throw _error_.
-  - Let _changeObservers_ be the result of getting the internal property [[ChangeObservers]] of _notifier_.
-  - If _changeObservers_ is empty, return.
-  - Let _target_ be [[Target]] of _notifier_.
-  - Let _newRecord_ be the result of the abstract operation ObjectCreate (15.12).
-  - Call the [[DefineOwnProperty]] internal method of _newRecord_ with arguments **''"object"''**, the Property Descriptor {[[Value]]: _target_, [[Writable]]: **''false''**, [[Enumerable]]: **''true''**, [[Configurable]]: **''false''**}, and **''true''**.
-  - Call the [[DefineOwnProperty]] internal method of _newRecord_ with arguments **''"type"''**, the Property Descriptor {[[Value]]: _changeType_, [[Writable]]: **''false''**, [[Enumerable]]: **''true''**, [[Configurable]]: **''false''**}, and **''true''**.
-  - For each enumerable property name _N_ in _changeRecord_,
-    - If _N_ is not **''"object"''** and _N_ is not **''"type"''**, then
-      - Let _value_ be the result of calling the [[Get]] internal method of _changeRecord_ with _N_.
-      - Call the [[DefineOwnProperty]] internal method of _newRecord_ with arguments _N_, the Property Descriptor {[[Value]]: _value_, [[Writable]]: **''false''**, [[Enumerable]]: **''true''**, [[Configurable]]: **''false''**}, and **''true''**.
-  - Set the [[Extensible]] internal property of _newRecord_ to **''false''**.
-  - Call the [[EnqueueChangeRecord]], passing _target_ and _newRecord_ as arguments.
+  1. Let _O_ be the **this** value.
+  1. If Type(_O_) is not Object, throw a **TypeError** exception.
+  1. If _O_ does not have a [[Target]] internal slot return.
+  1. 1. Let _target_ be the value of _O_'s [[Target]] internal slot.
+  1. If Type(_changeType_) is not string, throw a **TypeError** exception.
+  1. If IsCallable(_changeFn_) is **false**, throw a **TypeError** exception.
+  1. Call BeginChange(_target_, _changeType_).
+  1. Let _changeRecord_ be the result of calling the [[Call]] internal method of _changeFn_, with **undefined** as _thisArgument_ and an empty List as _argumentsList_.
+  1. Call EndChange(_target_, _changeType_).
+  1. ReturnIfAbrubt(_changeRecord_).
+  1. Let _changeObservers_ be the value of _O_'s [[ChangeObservers]] internal slot.
+  1. If _changeObservers_ is empty, return.
+  1. Let _target_ be the value of _O_'s [[Target]] internal slot.
+  1. Let _newRecord_ be ObjectCreate(%ObjectPrototype%).
+  1. Let _desc_ be the PropertyDescriptor{[[Value]]: _target_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
+  1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _newRecord_ passing `"object"` and _desc_ as arguments.
+  1. Assert: _success_ is **true**.
+  1. Let _desc_ be the PropertyDescriptor{[[Value]]: _changeType_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
+  1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _newRecord_ passing `"type"` and _desc_ as arguments.
+  1. Assert: _success_ is **true**.
+  1. Let _names_ be the result of calling the [[Enumerate]] internal method of _changeRecord_ with no arguments.
+  1. Repeat for each element _N_ of _names_ in List order,
+    1. If _N_ is not `"object"` and _N_ is not `"type"`, then
+      1. Let _value_ be Get(_changeRecord_, _N_).
+      1. ReturnIfAbrubt(_value_).
+      1. Let _desc_ be the PropertyDescriptor{[[Value]]: _value_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
+      1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _newRecord_ passing _N_ and _desc_ as arguments.
+      1. Assert: _success_ is **true**.
+  1. Set the value of the [[Extensible]] internal slot of _newRecord_ to **false**.
+  1. Call EnqueueChangeRecord(_target_, _newRecord_).
 
 
 ### GetNotifier(O)
@@ -235,7 +238,7 @@ When the abstract operation CreateChangeRecord is called with the arguments: _ty
   - If IsDataDescriptor(_oldDesc_) is true:
     - If IsDataDescritor(_newDesc_) is false or SameValue(oldDesc.[[Value]], newDesc.[[Value]]) is false
       - Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"oldValue"''**, Property Descriptor {[[Value]]: _oldDesc_.`[Value]], [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
-  - Set the [[Extensible]] internal property of _changeRecord_ to **false**.
+  - Set the [[Extensible]] internal slot of _changeRecord_ to **false**.
   - Return _changeRecord_.
 
 
@@ -253,5 +256,5 @@ When the abstract operation CreateSpliceChangeRecord is called with the argument
   - Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"index"''**, Property Descriptor {[[Value]]: _index_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
   - Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"removed"''**, Property Descriptor {[[Value]]: _removed_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
   - Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"addedCount"''**, Property Descriptor {[[Value]]: _addedCount_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
-  - Set the [[Extensible]] internal property of _changeRecord_ to **false**.
+  - Set the [[Extensible]] internal slot of _changeRecord_ to **false**.
   - Return _changeRecord_.
