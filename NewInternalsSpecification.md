@@ -150,25 +150,22 @@ When the abstract operation ShouldDeliverToObserver is called with Object _activ
 
 
 
-### [[EnqueueChangeRecord]]
+### EnqueueChangeRecord(O, changeRecord)
 
-There is now an abstract `[[EnqueueChangeRecord]]` internal algorithm:
+When the abstract operation EnqueueChangeRecord is called with Object _O_ and change record _changeRecord_ the following steps are taken:
 
-?.??.?? `[[EnqueueChangeRecord]]` (O, changeRecord)
+  1. Let _notifier_ be GetNotifier(_O_).
+  1. Let _changeType_ be  Get(_changeRecord_, "type").
+  1. Let _activeChanges_ be the value of _notfier_'s `[[ActiveChanges]]` internal slot.
+  1. Let _changeObservers_ be the value of _notifier_'s `[[ChangeObservers]]` internal slot.
+  1. For each _observerRecord_ in _changeObservers_, do
+    1. Let _acceptList_ be Get(_observerRecord_, `"accept"`).
+    1. Let _deliver_ be ShouldDeliverToObserver(_activeChanges_, _acceptList_, _changeType_).
+    1. If _deliver_ is **false**, continue.
+    1. Otherwise, let _observer_ be Get(_observerRecord_, "callback"`).
+    1. Let _pendingRecords_ be the value of _observer_'s `[[PendingChangeRecords]]` internal slot.
+    1. Append _changeRecord_ to the end of _pendingRecords_.
 
-When the `[[EnqueueChangeRecord]]` internal algorithm is called, the following steps are taken:
-
-  - Let _notifier_ be the result of calling `[[GetNotifier]]`, passing _O_.
-  - Let _changeType_ be the result of calling Get(_changeRecord_, "type").
-  - Let _activeChanges_ be `[[ActiveChanges]]` of _notifier_.
-  - Let _changeObservers_ be `[[ChangeObservers]]` of _notifier_.
-  - For each _observerRecord_ in _changeObservers_:
-    - Let _acceptList_ be the result of calling Get(_observerRecord_, “accept”).
-    - Let _deliver_ be the result of calling `[[ShouldDeliverToObserver]]` with _activeChanges_, _acceptList_ and _changeType_.
-    - If _deliver_ is **false**, continue.
-    - Otherwise, Let _observer_ be Get(_observerRecord_, "callback").
-    - Let _pendingRecords_ be the result of getting `[[PendingChangeRecords]]` for _observer_.
-    - Append _changeRecord_ to the end of _pendingRecords_.
 
 ### [[DeliverChangeRecords]]
 
