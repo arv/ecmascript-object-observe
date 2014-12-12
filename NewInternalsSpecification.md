@@ -223,23 +223,29 @@ Note: It is the intention that the embedder will call this internal algorithm wh
 
 
 
-### [[CreateChangeRecord]]
+### CreateChangeRecord(type, object, name, oldDesc, newDesc)
 
-There is now an abstract operation [[CreateChangeRecord]]:
+When the abstract operation CreateChangeRecord is called with string _type_, Object _object_, _name_, Object _oldDesc_ and Object _newDesc_ the following steps are taken:
 
-?.??.?? [[CreateChangeRecord]] (type, object, name, oldDesc, newDesc)
+  1. Let _changeRecord_ be ObjectCreate(%ObjectPrototype%).
+  1. Let _desc_ be the PropertyDescriptor{[[Value]]: _type_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
+  1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _changeRecord_ passing `"type"` and _desc_ as arguments.
+  1. Assert: _success_ is **true**.
 
-When the abstract operation CreateChangeRecord is called with the arguments: _type_, _object_, _name_ and _oldDesc_, the following steps are taken:
-
-  - Let _changeRecord_ be the result of the abstraction operation ObjectCreate (15.2).
-  - Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"type"''**, Property Descriptor {[[Value]]: _type_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
-  - Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"object"''**, Property Descriptor {[[Value]]: _object_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
-  - If Type(_name_) is string, Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"name"''**, Property Descriptor {[[Value]]: _name_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
-  - If IsDataDescriptor(_oldDesc_) is true:
-    - If IsDataDescritor(_newDesc_) is false or SameValue(oldDesc.[[Value]], newDesc.[[Value]]) is false
-      - Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"oldValue"''**, Property Descriptor {[[Value]]: _oldDesc_.`[Value]], [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
-  - Set the [[Extensible]] internal slot of _changeRecord_ to **false**.
-  - Return _changeRecord_.
+  1. Let _desc_ be the PropertyDescriptor{[[Value]]: _object_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
+  1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _changeRecord_ passing `"object"` and _desc_ as arguments.
+  1. Assert: _success_ is **true**.
+  1. If IsPropertyKey(_name_) is true, then
+    1. Let _desc_ be the PropertyDescriptor{[[Value]]: _name_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
+    1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _changeRecord_ passing `"name"` and _desc_ as arguments.
+    1. Assert: _success_ is **true**.
+  1. If IsDataDescriptor(_oldDesc_) is **true**, then
+    1. If IsDataDescritor(_newDesc_) is **false** or SameValue(_oldDesc_.[[Value]], _newDesc_.[[Value]]) is **false**, then
+      1. Let _desc_ be the PropertyDescriptor{[[Value]]: _oldDesc_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
+      1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _changeRecord_ passing `"oldValue"` and _desc_ as arguments.
+      1. Assert: _success_ is **true**.
+  1. Set the value of the [[Extensible]] internal slot of _changeRecord_ to **false**.
+  1. Return _changeRecord_.
 
 
 ### [[CreateSpliceChangeRecord]]
@@ -256,5 +262,5 @@ When the abstract operation CreateSpliceChangeRecord is called with the argument
   - Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"index"''**, Property Descriptor {[[Value]]: _index_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
   - Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"removed"''**, Property Descriptor {[[Value]]: _removed_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
   - Call the [[DefineOwnProperty]] internal method of _changeRecord_ with arguments **''"addedCount"''**, Property Descriptor {[[Value]]: _addedCount_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}, and **false**.
-  - Set the [[Extensible]] internal slot of _changeRecord_ to **false**.
+  - Set the value of the [[Extensible]] internal slot of _changeRecord_ to **false**.
   - Return _changeRecord_.
