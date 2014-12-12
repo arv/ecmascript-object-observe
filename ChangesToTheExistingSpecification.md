@@ -70,15 +70,16 @@ Modify the [[Delete]] algorithm as __indicated__:
 
 When the [[Delete]] internal method of _O_ is called with property key _P_ the following steps are taken:
 
-  1. Assert: IsPropertyKey(P) is true.
-  1. Let _desc_ be the result of calling the `[GetOwnProperty]] internal method of _O_ with argument _P_.
-  1. If _desc_ is undefined, then return true.
+  1. Assert: IsPropertyKey(_P_) is **true**.
+  1. Let _desc_ be the result of calling the [GetOwnProperty]] internal method of _O_ with argument _P_.
+  1. ReturnIfAbrupt(_desc_).
+  1. If _desc_ is **undefined**, then return **true**.
   1. __Let _notifier_ be GetNotifier(_O_).__
-  1. If desc.[[Configurable]] is true, then
+  1. If _desc_.[[Configurable]] is **true**, then
     1. Remove the own property with name _P_ from _O_.
     1. __Let _R_ be CreateChangeRecord(`"delete"`, _O_, _P_, _desc_).__
     1. __Call EnqueueChangeRecord(_O_ and _R_).__
-    1. Return true.
+    1. Return **true**.
   1. Return false.
 
 
