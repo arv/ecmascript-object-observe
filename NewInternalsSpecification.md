@@ -155,7 +155,7 @@ When the abstract operation ShouldDeliverToObserver is called with Object _activ
 When the abstract operation EnqueueChangeRecord is called with Object _O_ and change record _changeRecord_ the following steps are taken:
 
   1. Let _notifier_ be GetNotifier(_O_).
-  1. Let _changeType_ be  Get(_changeRecord_, "type").
+  1. Let _changeType_ be  Get(_changeRecord_, `"type"`).
   1. Let _activeChanges_ be the value of _notfier_'s `[[ActiveChanges]]` internal slot.
   1. Let _changeObservers_ be the value of _notifier_'s `[[ChangeObservers]]` internal slot.
   1. For each _observerRecord_ in _changeObservers_, do
