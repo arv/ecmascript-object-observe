@@ -1,13 +1,9 @@
 # Object.observe: Modifications to existing internal algorithms
 
 
+Modifications to existing algorithms are __indicated like this__:
 
-
-### [[ValidateAndApplyPropertyDescriptor]]
-
-Modify the ValidateAndApplyPropertyDescriptor  algorithm as __indicated__:
-
-9.1.6.3 ValidateAndApplyPropertyDescriptor (O, P, extensible, Desc, current)
+### 9.1.6.3 ValidateAndApplyPropertyDescriptor (O, P, extensible, Desc, current)
 
 When the abstract operation ValidateAndApplyPropertyDescriptor is called with Object O, property key P, Boolean value extensible, and property descriptors Desc, and current the following steps are taken:
 
@@ -61,12 +57,7 @@ NOTE: If undefined is passed as the O argument only validation is performed and 
 
 
 
-
-### [[Delete]]
-
-Modify the [[Delete]] algorithm as __indicated__:
-
-9.1.10 [[Delete]] (P)
+### 9.1.10 [[Delete]] (P)
 
 When the [[Delete]] internal method of _O_ is called with property key _P_ the following steps are taken:
 
@@ -87,9 +78,7 @@ When the [[Delete]] internal method of _O_ is called with property key _P_ the f
 
 
 
-### [[PreventExtensions]]
-
-9.1.4 [[PreventExtensions]] ()
+### 9.1.4 [[PreventExtensions]] ()
 
 When the [[PreventExtensions]] internal method of _O_ is called the following steps are taken:
 
@@ -102,9 +91,7 @@ When the [[PreventExtensions]] internal method of _O_ is called the following st
   1. Return **true**.
 
 
-### [[SetPrototypeOf]]
-
-9.1.2 [[SetPrototypeOf]] (V)
+### 9.1.2 [[SetPrototypeOf]] (V)
 
 When the [[SetPrototypeOf]] internal method of _O_ is called with argument _V_ the following steps are taken:
 
