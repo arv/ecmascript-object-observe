@@ -73,16 +73,13 @@ When the [[Delete]] internal method of _O_ is called with property key _P_ the f
   - Assert: IsPropertyKey(P) is true.
   - Let _desc_ be the result of calling the `[GetOwnProperty]] internal method of _O_ with argument _P_.
   - If _desc_ is undefined, then return true.
-  - __Let _notifier_ be the result of calling [[GetNotifier]], passing _O_.__
+  - __Let _notifier_ be GetNotifier(_O_).__
   - If desc.[[Configurable]] is true, then
     - Remove the own property with name _P_ from _O_.
-    - __Let _R_ be the result of calling [[CreateChangeRecord]] with arguments: “delete”, _O_, _P_ and _desc_.__
-    - __Call [[EnqueueChangeRecord]] passing _O_ and _R_.__
+    - __Let _R_ be CreateChangeRecord(`"delete"`, _O_, _P_, _desc_).__
+    - __Call EnqueueChangeRecord(_O_ and _R_).__
     - Return true.
   - Return false.
-
-
-
 
 
 
@@ -99,8 +96,8 @@ When the [[PreventExtensions]] internal method of _O_ is called the following st
   - Set the value of the [[Extensible]] internal data property of O to false.
   - If _wasExtensible_ is false, return true.
   - __Let _notifier_ be the result of calling [[GetNotifier]], passing _O_.__
-  - __Let _R_ be the result of calling [[CreateChangeRecord]] with arguments: “preventExtensions”, _O_.__
-  - __Call [[EnqueueChangeRecord]] passing _O_ and _R_.__
+  - __Let _R_ be CreateChangeRecord(`"preventExtensions"`, _O_).__
+  - __Call EnqueueChangeRecord(_O_, _R_).__
   - Return true.
 
 
