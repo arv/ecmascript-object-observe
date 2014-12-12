@@ -135,20 +135,17 @@ There is now a `[[EndChange]]` internal algorithm:
 
 
 
-### [[ShouldDeliverToObserver]]
+### ShouldDeliverToObserver(activeChanges, acceptList, changeType)
 
-There is now an abstract `[[ShouldDeliverToObserver]]` internal algorithm:
+When the abstract operation ShouldDeliverToObserver is called with Object _activeChanges_, List _acceptList_ and string _changeType_ the following steps are taken:
 
-?.??.?? `[[ShouldDeliverToObserver]]` (activeChanges, acceptList, changeType)
-
-When the `[[ShouldDeliverToObserver]]` internal algorithm is called, the following steps are taken:
-
-  - Let _doesAccept_ be **false**
-  - For each _accept_ in _acceptList_
-    - If _activeChanges_[_accept_] > 0, return **false**
-    - If _accept_ == _changeType_
-      - Set _doesAccept_ to **true**  
-  - return _doesAccept_.
+  1. Let _doesAccept_ be **false**.
+  1. For each _accept_ in _acceptList_, do
+    1. Let _activeChangeCount_ be Get(_activeChanges_, _accept_).
+    1. If _activeChangeCount_ > 0, return **false**.
+    1. If _accept_ is same string as _changeType_, then
+      1. Let _doesAccept_ be **true**  .
+  1. return _doesAccept_.
 
 
 
