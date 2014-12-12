@@ -84,21 +84,19 @@ Let _performChange_ be a function, which when invoked does the following:
   - Call the `[[EnqueueChangeRecord]]`, passing _target_ and _newRecord_ as arguments.
 
 
-### [[GetNotifier]]
+### GetNotifier(O)
 
-There is now a `[[GetNotifier]]` internal algorithm:
+When the abstract operation GetNotifier is called with Object _O_ the following steps are taken:
 
-?.??.?? `[[GetNotifier]]` (O)
-
-  - Let _notifier_ be `[[Notifier]]` of _O_.
-  - If _notifier_ is **undefined**
-    - Let _notifier_ be the result the abstract operation ObjectCreate (15.12).
-    - Set the `[[Prototype]]` of _notifier_ to `[[NotifierPrototype]]`.
-    - Set the internal property `[[Target]]` of _notifier_ to be _O_.
-    - Set the internal property `[[ChangeObservers]]` of _notifier_ to be a new empty list.
-    - Set the internal property `[[ActiveChanges]]` of _notifier_ to be the result of ObjectCreate(null).
-    - Set `[[Notifier]]` of _O_ to _notifier_.
-  - return _notifier_.
+  1. Let _notifier_ be the value of _O_'s `[[Notifier]]` internal slot.
+  1. If _notifier_ is **undefined**, then
+    1. Let _notifier_ be ObjectCreate(%ObjectPrototype%, ([[Target]], [[ChangeObservers]], [[ActiveChanges]])).
+    1. Set the `[[Prototype]]` of _notifier_ to `[[NotifierPrototype]]`
+    1. Set _notifier_'s `[[Target]]` internal slot to _O_.
+    1. Set _notifier_'s `[[ChangeObservers]]` internal slot to a new empty list.
+    1. Set _notifier_'s `[[ActiveChanges]]` internal slot to ObjectCreate(**null**).
+    1. Set _O_'s `[[Notifier]]` internal slot to _notifier_.
+  1. return _notifier_.
 
 
 ### [[BeginChange]]
