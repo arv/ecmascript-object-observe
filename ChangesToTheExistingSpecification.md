@@ -16,17 +16,17 @@ This algorithm contains steps that test various fields of the Property Descripto
 NOTE: If undefined is passed as the O argument only validation is performed and no object updates are performed.
 
 
-  - Assert: If O is not undefined then P is a valid property key.
-  - __Let changeType be a string, initially set to “reconfigure”.__
-  - If current is undefined, then
-    - If extensible is false, then return false.
-    - Assert: extensible is true.
-    - If IsGenericDescriptor(Desc) or IsDataDescriptor(Desc) is true, then
-      - If O is not undefined, then create an own data property named P of object O whose `[[Value]]`, `[[Writable]]`, `[[Enumerable]]` and `[[Configurable]]` attribute values are described by Desc. If the value of an attribute field of Desc is absent, the attribute of the newly created property is set to its default value.
+  - Assert: If _O_ is not **undefined** then _P_ is a valid property key.
+  - __Let _changeType_ be a string, initially set to `"reconfigure"`.__
+  - If _current_ is **undefined**, then
+    - If _extensible_ is **false**, then return **false**.
+    - Assert: _extensible_ is **true**.
+    - If IsGenericDescriptor(_Desc_) or IsDataDescriptor(_Desc_) is **true**, then
+      - If _O_ is not **undefined**, then create an own data property named _P_ of object _O_ whose `[[Value]]`, `[[Writable]]`, `[[Enumerable]]` and `[[Configurable]]` attribute values are described by Desc. If the value of an attribute field of Desc is absent, the attribute of the newly created property is set to its default value.
     - Else Desc must be an accessor Property Descriptor,
       - If O is not undefined, then create an own accessor property named P of object O whose `[[Get]]`, `[[Set]]`, `[[Enumerable]]` and `[[Configurable]]` attribute values are described by Desc. If the value of an attribute field of Desc is absent, the attribute of the newly created property is set to its default value.
-    - __Let R be the result of calling `[[CreateChangeRecord]]` with arguments: "add", O, P, current and Desc.__
-    - __Call `[[EnqueueChangeRecord]]` passing O and R__
+    - __Let _R_ be the result of calling `[[CreateChangeRecord]]` with arguments: `"add"`, _O_, _P_, _current_ and _Desc_.__
+    - __Call `[[EnqueueChangeRecord]]` passing _O_ and _R_.__
     - Return true.
   - Return true, if every field in Desc is absent.
   - Return true, if every field in Desc also occurs in current and the value of every field in Desc is the same value as the corresponding field in current when compared using the SameValue algorithm.
@@ -46,15 +46,15 @@ NOTE: If undefined is passed as the O argument only validation is performed and 
       - If the `[[Writable]]` field of current is false, then
         - Return false, if the `[[Value]]` field of Desc is present and SameValue(Desc.`[[Value]]`, current.`[[Value]]`) is false.
     - else the `[[Configurable]]` field of current is true, so any change is acceptable.
-    - __If `[[Configurable]]` is not in Desc or SameValue(Desc.`[[Configurable]]`, current.`[[Configurable]]`) is true and `[[Enumerable]]` is not in Desc or SameValue(Desc.`[[Enumerable]]`,current.`[[Enumerable]]`) is true and `[[Writable]]` is not  in Desc or SameValue(Desc.`[[Writable]]`, current.`[[Writable]]`) is true, then__
-      - __Set changeType to be the string "update".__
+    - __If `[[Configurable]]` is not in _Desc_ or SameValue(Desc.`[[Configurable]]`, _current_.`[[Configurable]]`) is **true** and `[[Enumerable]]` is not in _Desc_ or SameValue(_Desc_.`[[Enumerable]]`, _current_.`[[Enumerable]]`) is true and `[[Writable]]` is not  in Desc or SameValue(Desc.`[[Writable]]`, _current_.`[[Writable]]`) is **true**, then__
+      - __Set _changeType_ to be the string `"update"`.__
   - Else IsAccessorDescriptor(current) and IsAccessorDescriptor(Desc) are both true,
     - If the `[[Configurable]]` field of current is false, then
       - Return false, if the `[[Set]]` field of Desc is present and SameValue(Desc.`[[Set]]`, current.`[[Set]]`) is false.
       - Return false, if the `[[Get]]` field of Desc is present and SameValue(Desc.`[[Get]]`, current.`[[Get]]`) is false.
   - If O is not undefined, then
     - For each attribute field of Desc that is present, set the correspondingly named attribute of the property named P of object O to the value of the field.
-  - __Let R be the result of calling `[[CreateChangeRecord]]` with arguments: changeType, O, P, current and Desc.__
+  - __Let _R_ be the result of calling `[[CreateChangeRecord]]` with arguments: _changeType_, _O_, _P_, _current_ and _Desc_.__
   - __Call `[[EnqueueChangeRecord]]` passing O and R__
   - Return true.
 
