@@ -57,7 +57,7 @@ NOTE: If undefined is passed as the O argument only validation is performed and 
 
 
 
-### 9.1.10 [[Delete]] (P)
+### 9.1.10 `[[Delete]] (P)`
 
 When the [[Delete]] internal method of _O_ is called with property key _P_ the following steps are taken:
 
@@ -78,7 +78,7 @@ When the [[Delete]] internal method of _O_ is called with property key _P_ the f
 
 
 
-### 9.1.4 [[PreventExtensions]] ()
+### 9.1.4 `[[PreventExtensions]] ()`
 
 When the [[PreventExtensions]] internal method of _O_ is called the following steps are taken:
 
@@ -91,7 +91,7 @@ When the [[PreventExtensions]] internal method of _O_ is called the following st
   1. Return **true**.
 
 
-### 9.1.2 [[SetPrototypeOf]] (V)
+### 9.1.2 `[[SetPrototypeOf]] (V)`
 
 When the [[SetPrototypeOf]] internal method of _O_ is called with argument _V_ the following steps are taken:
 
