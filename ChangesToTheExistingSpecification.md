@@ -93,13 +93,13 @@ When the [[Delete]] internal method of _O_ is called with property key _P_ the f
 
 When the [[PreventExtensions]] internal method of _O_ is called the following steps are taken:
 
-  1. __Let _wasExtensible_ be the value of the [[Extensible]] internal data property of _O_.__
-  1. Set the value of the [[Extensible]] internal data property of O to false.
-  1. If _wasExtensible_ is false, return true.
-  1. __Let _notifier_ be the result of calling [[GetNotifier]], passing _O_.__
+  1. __Let _wasExtensible_ be the value of _O_'s [[Extensible]] internal slot.__
+  1. Set the value of the [[Extensible]] internal slot of _O_ to **false**.
+  1. If _wasExtensible_ is **false**, return **true**.
+  1. __Let _notifier_ be GetNotifier(_O_).__
   1. __Let _R_ be CreateChangeRecord(`"preventExtensions"`, _O_).__
   1. __Call EnqueueChangeRecord(_O_, _R_).__
-  1. Return true.
+  1. Return **true**.
 
 
 ### [[SetPrototypeOf]]
