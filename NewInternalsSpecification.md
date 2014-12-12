@@ -93,24 +93,25 @@ When the abstract operation GetNotifier is called with Object _O_ the following 
     1. Let _notifier_ be ObjectCreate(%ObjectPrototype%, ([[Target]], [[ChangeObservers]], [[ActiveChanges]])).
     1. Set the [[Prototype]] of _notifier_ to [[NotifierPrototype]]
     1. Set _notifier_'s [[Target]] internal slot to _O_.
-    1. Set _notifier_'s [[ChangeObservers]] internal slot to a new empty list.
+    1. Set _notifier_'s [[ChangeObservers]] internal slot to a new empty List.
     1. Set _notifier_'s [[ActiveChanges]] internal slot to ObjectCreate(**null**).
     1. Set _O_'s [[Notifier]] internal slot to _notifier_.
   1. return _notifier_.
 
 
-### [[BeginChange]]
+### BeginChange(O, changeType)
 
-There is now a [[BeginChange]] internal algorithm:
+When the abstract operation BeginChange is called with Object _O_ and string _changeType_ the following steps are taken:
 
-?.??.?? [[BeginChange]] (O, changeType)
-
-  - Let _notifier_ be the result of calling [[GetNotifier]] passing _O_.
-  - Let _activeChanges_ be [[ActiveChanges]] of _notifier_.
-  - Let _changeCount_ be Get(_activeChanges_, _changeType_).
-  - If _changeCount_ is **undefined**, let _changeCount_ be 1.
-  - Else, let _changeCount_ be _changeCount_ + 1.
-  - Perform CreateOwnDataProperty(_activeChanges_, _changeType_, _changeCount_).
+  1. Assert: Type(_O_) is Object.
+  1. Assert: Type(_changeType_) is String.
+  1. Let _notifier_ be GetNotifier(_O_).
+  1. Let _activeChanges_ be the value of _notifier_'s [[ActiveChanges]] internal slot.
+  1. Let _changeCount_ be Get(_activeChanges_, _changeType_).
+  1. If _changeCount_ is **undefined**, let _changeCount_ be 1.
+  1. Else, let _changeCount_ be _changeCount_ + 1.
+  1. Let _success_ be CreateDataProperty(_activeChanges_, _changeType_, _changeCount_).
+  1. Assert: _success_ is **true**.
 
 
 
