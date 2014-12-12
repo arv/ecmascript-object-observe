@@ -22,35 +22,39 @@ Every object _O_ now has a [[Notifier]] internal property which is initially **'
 
 Note: This gets lazily initialized to a notifier object which is an object with the [[NotifierPrototype]] as its [[Prototype]].
 
+## Notifier Objects
 
+A Notifier Object is an object returned from `Object.getNotifier`. There is not a named constructor for Notifier Objects.
 
-### [[NotifierPrototype]]
+### Properties of Notifier Prototype
 
-The [[NotifierPrototype]] is an ordinary object which is used as the [[Prototype]] of all notifiers returned by ''Object.getNotifier(O)''. It has two properties which are defined below.
+### The %NotifierPrototype% Object 
 
+All Notifier Objects inherit properties from the %NotifierPrototype% intrinsic object. The %NotifierPrototype% intrinsic object is an ordinary object and its [[Prototype]] internal slot is the %ObjectPrototype% intrinsic object (19.1.3). In addition, %NotifierPrototype% has the following properties:
 
+### %NotifierPrototype%.notify(_changeRecord_)
 
-### [[NotifierPrototype]].notify
-
-The notify function of the [[NotifierPrototype]] is defined as follows:
-
-Let _notifyFunction_ be a function, which when invoked does the following:
-  - Let _changeRecord_ be the first argument to the function.
-  - Let _notifier_ be [[This]].
-  - If Type(_notifier_) is not Object, throw a **''TypeError''** exception.
-  - If _notifier_ does not have an internal property [[Target]] return.
-  - Let _type_ be the result of calling the [[Get]] internal method of _changeRecord_ with **''"type"''**.
-  - If Type(_type_) is not string, throw a **''TypeError''** exception.
-  - Let _target_ be [[Target]] of _notifier_.
-  - Let _newRecord_ be the result of the abstract operation ObjectCreate (15.12).
-  - Call the [[DefineOwnProperty]] internal method of _newRecord_ with arguments **''"object"''**, the Property Descriptor {[[Value]]: _target_, [[Writable]]: **''false''**, [[Enumerable]]: **''true''**, [[Configurable]]: **''false''**}, and **''true''**.
-  - For each enumerable property name _N_ in _changeRecord_,
-    - If _N_ is not **''"object"''**, then
-      - Let _value_ be the result of calling the [[Get]] internal method of _changeRecord_ with _N_.
-      - Call the [[DefineOwnProperty]] internal method of _newRecord_ with arguments _N_, the Property Descriptor {[[Value]]: _value_, [[Writable]]: **''false''**, [[Enumerable]]: **''true''**, [[Configurable]]: **''false''**}, and **''true''**.
-  - Set the [[Extensible]] internal property of _newRecord_ to **''false''**.
-  - Call the [[EnqueueChangeRecord]], passing _target_ and _newRecord_ as arguments.
-
+  1. Let _O_ be the **this** value.
+  1. If Type(_O_) is not Object, throw a **TypeError** exception.
+  1. If _O_ does not have an internal property [[Target]] return.
+  1. Let _type_ be Get(_changeRecord_, `"type"`).
+  1. ReturnIfAbrubt(_type_).
+  1. If Type(_type_) is not string, throw a **TypeError** exception.
+  1. Let _target_ be the value of _O_'s [[Target]] internal slot.
+  1. Let _newRecord_ be ObjectCreate(%ObjectPrototype%).
+  1. Let _desc_ be the PropertyDescriptor{[[Value]]: _target_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
+  1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _newRecord_ passing `"object"` and _desc_ as arguments.
+  1. Assert: _success_ is **true**.
+  1. Let _names_ be the result of calling the [[Enumerate]] internal method of _changeRecord_ with no arguments.
+  1. Repeat for each element _N_ of _names_ in List order,
+    1. If _N_ is not `"object"`, then
+      1. Let _value_ be Get(_changeRecord_, _N_).
+      1. ReturnIfAbrubt(_value_).
+      1. Let _desc_ be the PropertyDescriptor{[[Value]]: _value_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
+      1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _newRecord_ passing _N_ and _desc_ as arguments.
+      1. Assert: _success_ is **true**.
+  1. Set the value of the [[Extensible]] internal slot of _newRecord_ to **false**.
+  1. Call EnqueueChangeRecord(_target_, _newRecord_).
 
 
 ### [[NotifierPrototype]].performChange
@@ -90,8 +94,7 @@ When the abstract operation GetNotifier is called with Object _O_ the following 
 
   1. Let _notifier_ be the value of _O_'s [[Notifier]] internal slot.
   1. If _notifier_ is **undefined**, then
-    1. Let _notifier_ be ObjectCreate(%ObjectPrototype%, ([[Target]], [[ChangeObservers]], [[ActiveChanges]])).
-    1. Set the [[Prototype]] of _notifier_ to [[NotifierPrototype]]
+    1. Let _notifier_ be ObjectCreate(%NotifierPrototype%, ([[Target]], [[ChangeObservers]], [[ActiveChanges]])).
     1. Set _notifier_'s [[Target]] internal slot to _O_.
     1. Set _notifier_'s [[ChangeObservers]] internal slot to a new empty List.
     1. Set _notifier_'s [[ActiveChanges]] internal slot to ObjectCreate(**null**).
