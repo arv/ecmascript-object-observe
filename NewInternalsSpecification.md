@@ -162,7 +162,7 @@ When the abstract operation EnqueueChangeRecord is called with Object _O_ and ch
     1. Let _acceptList_ be Get(_observerRecord_, `"accept"`).
     1. Let _deliver_ be ShouldDeliverToObserver(_activeChanges_, _acceptList_, _changeType_).
     1. If _deliver_ is **false**, continue.
-    1. Otherwise, let _observer_ be Get(_observerRecord_, "callback"`).
+    1. Otherwise, let _observer_ be Get(_observerRecord_, `"callback"`).
     1. Let _pendingRecords_ be the value of _observer_'s `[[PendingChangeRecords]]` internal slot.
     1. Append _changeRecord_ to the end of _pendingRecords_.
 
