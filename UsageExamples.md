@@ -168,7 +168,7 @@ Square.prototype = {
       return {
         ratio: ratio
       };
-    );
+    });
   },
 
   translate: function(dx, dy) {
