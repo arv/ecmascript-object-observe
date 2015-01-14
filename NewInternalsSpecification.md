@@ -223,6 +223,13 @@ When the [[DeliverAllChangeRecords]] internal algorithm is called, the following
 Note: It is the intention that the embedder will call this internal algorithm when it is time to deliver the change records.
 
 
+### CreateAndEnqueueChangeRecord(type, object, name, oldDesc, newDesc)
+
+When the abstract operation CreateChangeRecord is called with string _type_, Object _object_, _name_, Object _oldDesc_ and Object _newDesc_ the following steps are taken:
+
+  1. Let _record_ be CreateChangeRecord(_type_, _object_, _name_, _oldDesc_, _newDes_).
+  1. Call EnqueueChangeRecord(_object_, _record_).
+
 
 ### CreateChangeRecord(type, object, name, oldDesc, newDesc)
 
