@@ -21,8 +21,7 @@ NOTE: If undefined is passed as the O argument only validation is performed and 
       1. If _O_ is not **undefined**, then create an own data property named _P_ of object _O_ whose [[Value]], [[Writable]], [[Enumerable]] and [[Configurable]] attribute values are described by Desc. If the value of an attribute field of Desc is absent, the attribute of the newly created property is set to its default value.
     1. Else Desc must be an accessor Property Descriptor,
       1. If O is not undefined, then create an own accessor property named P of object O whose [[Get]], [[Set]], [[Enumerable]] and [[Configurable]] attribute values are described by Desc. If the value of an attribute field of Desc is absent, the attribute of the newly created property is set to its default value.
-    1. __Let _R_ be CreateChangeRecord(`"add"`, _O_, _P_, _current_, _Desc_).__
-    1. __Call EnqueueChangeRecord(_O_, _R_).__
+    1. __Call CreateAndEnqueueChangeRecord(`"add"`, _O_, _P_, _current_, _Desc_).__
     1. Return true.
   1. Return true, if every field in Desc is absent.
   1. Return true, if every field in Desc also occurs in current and the value of every field in Desc is the same value as the corresponding field in current when compared using the SameValue algorithm.
@@ -50,8 +49,7 @@ NOTE: If undefined is passed as the O argument only validation is performed and 
       1. Return false, if the [[Get]] field of Desc is present and SameValue(Desc.[[Get]], current.[[Get]]) is false.
   1. If O is not undefined, then
     1. For each attribute field of Desc that is present, set the correspondingly named attribute of the property named P of object O to the value of the field.
-  1. __Let _R_ be CreateChangeRecord(_changeType_, _O_, _P_, _current_, _Desc_).__
-  1. __Call EnqueueChangeRecord(_O_, _R_).__
+  1. __Call CreateAndEnqueueChangeRecord(_changeType_, _O_, _P_, _current_, _Desc_).__
   1. Return true.
 
 
@@ -68,8 +66,7 @@ When the [[Delete]] internal method of _O_ is called with property key _P_ the f
   1. __Let _notifier_ be GetNotifier(_O_).__
   1. If _desc_.[[Configurable]] is **true**, then
     1. Remove the own property with name _P_ from _O_.
-    1. __Let _R_ be CreateChangeRecord(`"delete"`, _O_, _P_, _desc_).__
-    1. __Call EnqueueChangeRecord(_O_ and _R_).__
+    1. __Call CreateAndEnqueueChangeRecord(`"delete"`, _O_, _P_, _desc_).__
     1. Return **true**.
   1. Return false.
 
@@ -86,8 +83,7 @@ When the [[PreventExtensions]] internal method of _O_ is called the following st
   1. Set the value of the [[Extensible]] internal slot of _O_ to **false**.
   1. If _wasExtensible_ is **false**, return **true**.
   1. __Let _notifier_ be GetNotifier(_O_).__
-  1. __Let _R_ be CreateChangeRecord(`"preventExtensions"`, _O_).__
-  1. __Call EnqueueChangeRecord(_O_, _R_).__
+  1. __Call CreateAndEnqueueChangeRecord(`"preventExtensions"`, _O_).__
   1. Return **true**.
 
 
