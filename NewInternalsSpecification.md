@@ -170,6 +170,9 @@ When the abstract operation EnqueueChangeRecord is called with Object _O_ and ch
   1. Let _activeChanges_ be the value of _notfier_'s [[ActiveChanges]] internal slot.
   1. Let _changeObservers_ be the value of _notifier_'s [[ChangeObservers]] internal slot.
   1. For each _observerRecord_ in _changeObservers_, do
+    1. Let _skip_ be Get(_observerRecord_, `"skip"`).
+    1. ReturnIfAbrupt(_skip_).
+    1. If _skip_ is **true**, continue.
     1. Let _acceptList_ be Get(_observerRecord_, `"accept"`).
     1. ReturnIfAbrupt(_acceptList_).
     1. Let _deliver_ be ShouldDeliverToObserver(_activeChanges_, _acceptList_, _changeType_).
