@@ -1,37 +1,46 @@
 # Public API Specification
 
-## Object.observe(O, callback, accept = undefined)
+## Object.observe(O, callback, options = undefined)
 
-When the `observe` method is called with arguments Object _O_, function _callback_ and _accept_ the following steps are taken:
+When the `observe` method is called with arguments Object _O_, function _callback_ and _options_ the following steps are taken:
 
   1. If Type(_O_) is not Object, throw a **TypeError** exception.
   1. If IsCallable(_callback_) is **false**, throw a **TypeError** exception.
   1. If TestIntegrityLevel(_callback_, `"frozen"`) is **true**, throw a **TypeError** exception.
-  1. If _accept_ is **undefined**, then
+  1. If _options_ is **undefined**, then
     1. Let _acceptList_ be a new List containing `"add"`, `"update"`, `"delete"`, `"reconfigure"`, `"setPrototype"` and `"preventExtensions"`.
+    1. Let _skipRecords_ be **false**.
   1. Else
+    1. Let _acceptTypes_ be GetOption(_options_, `"acceptTypes"`).
+    1. ReturnIfAbrubt(_acceptTypes_).
     1. Let _acceptList_ be a new List.
-    1. If Type(_accept_) is not Object, throw a **TypeError** exception.
-    1. Let _lenValue_ be the result of Get(_accept_, `"length"`)
+    1. If Type(_acceptTypes_) is not Object, throw a **TypeError** exception.
+    1. Let _lenValue_ be the result of Get(_acceptTypes_, `"length"`)
     1. ReturnIfAbrubt(_lenValue_).
     1. Let _len_ be ToLength(_lenValue_).
     1. ReturnIfAbrupt(_len_).
     1. Let _nextIndex_ be 0.
     1. While _nextIndex_ < _len_, repeat
-      1. Let _next_ be the result of Get(_accept_, ToString(_nextIndex_)).
+      1. Let _next_ be the result of Get(_acceptTypes_, ToString(_nextIndex_)).
       1. ReturnIfAbrupt(_next_).
       1. Let _nextString_ be ToString(_next_).
       1. ReturnIfAbrupt(_nextString_).
       1. Append _nextString_ to _acceptList_.
       1. Let _nextIndex_ be _nextIndex_ + 1.
+    1. Let _skipRecordsValue_ be GetOption(_options_, `"skipRecords"`).
+    1. ReturnIfAbrubt(_skipRecordsValue_).
+    1. Let _skipRecords_ be ToBoolean(_skipRecordsValue_).
+    1. ReturnIfAbrubt(_skipRecords_).
   1. Let _notifier_ be GetNotifier(_O_).
   1. Let _changeObservers_ be the value of _notifier_`s [[ChangeObservers]] internal slot.
   1. If _changeObservers_ already contains a _record_ whose _callback_ property is the same as _callback_, then
     1. Call CreateDataProperty(_record_, `"accept"`, _acceptList_).
+    1. Call CreateDataProperty(_record_, `"skip"`, _skipRecords_).
     1. Return _O_.
   1. Let _observerRecord_ be ObjectCreate(%ObjectPrototype%).
   1. Perform CreateDataProperty(_observerRecord_, `"callback"`, _callback_).
   1. Perform CreateDataProperty(_observerRecord_, `"accept"`, _acceptList_).
+  1. Call CreateDataProperty(_record_, `"skip"`, _skipRecords_).
   1. Append _observerRecord_ to the end of the _changeObservers_ list.
   1. Let _observerCallbacks_ be [[ObserverCallbacks]].
   1. If _observerCallbacks_ already contains _callback_, return _O_.
