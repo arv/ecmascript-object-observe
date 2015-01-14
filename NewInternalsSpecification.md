@@ -180,24 +180,22 @@ When the abstract operation EnqueueChangeRecord is called with Object _O_ and ch
     1. Append _changeRecord_ to the end of _pendingRecords_.
 
 
-### [[DeliverChangeRecords]]
+### DeliverChangeRecords(C)
 
-There is an abstract [[DeliverChangeRecords]` internal algorithm.
+When the abstract operation DeliverChangeRecords is called with callback _C_, the following steps are taken:
 
-?.??.?? [[DeliverChangeRecords]] (C)
-
-When the [[DeliverChangeRecords]] internal algorithm is called with callback _C_, the following steps are taken:
-
-  - Let _changeRecords_ be [[PendingChangeRecords]] of _C_.
-  - Clear the [[PendingChangeRecords]] of _C_.
-  - Let _array_ be the result of the abstraction operation ArrayCreate (15.4) with argument 0.
-  - Let _n_ be 0.
-  - For each _record_ in _changeRecords_, do:
-    - Call the [[DefineOwnProperty]] internal method of _array_ with arguments ToString(_n_), the PropertyDescriptor {[[Value]]: _record_, [[Writable]]: **true**, [[Enumerable]]: **true**, [[Configurable]]: **true**}, and **false**.
-    - Increment _n_ by 1.
-  - If _array_ is empty, return false.
-  - Call the [[Call]] internal method, (silently ignoring any thrown exception or return value) of _C_, passing undefined as the _this_ parameter, and a single argument, _array_.
-  - Return true.
+  1. Let _changeRecords_ be the value of _C_'s [[PendingChangeRecords]] internal slot.
+  1. Set _C_'s [[PendingChangeRecords]] internal slot to a new empty List.
+  1. Let _array_ be ArrayCreate(0).
+  1. Let _n_ be 0.
+  1. For each _record_ in _changeRecords_, do:
+    1. Let _status_ be the result of CreateDataProperty(_array_, ToString(_n_), _record).
+    1. Assert: _status_ is **true**.
+    1. Increment _n_ by 1.
+  1. If _array_ is empty, return **false**.
+  1. Let _status_ be Call(_C_, **undefined**, «_array_»).
+  1. _result_ is intentionall ignored here since. An implementation might choose to log abrubt completions here.
+  1. Return **true**.
 
 Note: The user facing function ''Object.deliverChangeRecords'' returns **''undefined''** to prevent detection if anything was delivered or not.
 
