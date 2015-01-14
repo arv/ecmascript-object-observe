@@ -159,28 +159,6 @@ When the abstract operation ShouldDeliverToObserver is called with Object _activ
 
 
 
-### EnqueueChangeRecord(O, changeRecord)
-
-When the abstract operation EnqueueChangeRecord is called with Object _O_ and change record _changeRecord_ the following steps are taken:
-
-  1. Assert: Type(_O_) is Object.
-  1. Let _notifier_ be GetNotifier(_O_).
-  1. Let _changeType_ be  Get(_changeRecord_, `"type"`).
-  1. ReturnIfAbrupt(_changeType_).
-  1. Let _activeChanges_ be the value of _notfier_'s [[ActiveChanges]] internal slot.
-  1. Let _changeObservers_ be the value of _notifier_'s [[ChangeObservers]] internal slot.
-  1. For each _observerRecord_ in _changeObservers_, do
-    1. Let _skip_ be Get(_observerRecord_, `"skip"`).
-    1. ReturnIfAbrupt(_skip_).
-    1. If _skip_ is **true**, continue.
-    1. Let _acceptList_ be Get(_observerRecord_, `"accept"`).
-    1. ReturnIfAbrupt(_acceptList_).
-    1. Let _deliver_ be ShouldDeliverToObserver(_activeChanges_, _acceptList_, _changeType_).
-    1. If _deliver_ is **false**, continue.
-    1. Otherwise, let _observer_ be Get(_observerRecord_, `"callback"`).
-    1. ReturnIfAbrupt(_observer_).
-    1. Let _pendingRecords_ be the value of _observer_'s [[PendingChangeRecords]] internal slot.
-    1. Append _changeRecord_ to the end of _pendingRecords_.
 
 
 ### DeliverChangeRecords(C)
@@ -192,7 +170,7 @@ When the abstract operation DeliverChangeRecords is called with callback _C_, th
   1. Let _array_ be ArrayCreate(0).
   1. Let _n_ be 0.
   1. For each _record_ in _changeRecords_, do:
-    1. Let _status_ be the result of CreateDataProperty(_array_, ToString(_n_), _record).
+    1. Let _status_ be the result of CreateDataProperty(_array_, ToString(_n_), _record_).
     1. Assert: _status_ is **true**.
     1. Increment _n_ by 1.
   1. If _array_ is empty, return **false**.
@@ -227,8 +205,32 @@ Note: It is the intention that the embedder will call this internal algorithm wh
 
 When the abstract operation CreateChangeRecord is called with string _type_, Object _object_, _name_, Object _oldDesc_ and Object _newDesc_ the following steps are taken:
 
-  1. Let _record_ be CreateChangeRecord(_type_, _object_, _name_, _oldDesc_, _newDes_).
+  1. Let _record_ be CreateChangeRecord(_type_, _object_, _name_, _oldDesc_, _newDesc_).
   1. Call EnqueueChangeRecord(_object_, _record_).
+
+
+### EnqueueChangeRecord(O, changeRecord)
+
+When the abstract operation EnqueueChangeRecord is called with Object _O_ and change record _changeRecord_ the following steps are taken:
+
+  1. Assert: Type(_O_) is Object.
+  1. Let _notifier_ be GetNotifier(_O_).
+  1. Let _changeType_ be  Get(_changeRecord_, `"type"`).
+  1. ReturnIfAbrupt(_changeType_).
+  1. Let _activeChanges_ be the value of _notfier_'s [[ActiveChanges]] internal slot.
+  1. Let _changeObservers_ be the value of _notifier_'s [[ChangeObservers]] internal slot.
+  1. For each _observerRecord_ in _changeObservers_, do
+    1. Let _skip_ be Get(_observerRecord_, `"skip"`).
+    1. ReturnIfAbrupt(_skip_).
+    1. If _skip_ is **true**, continue.
+    1. Let _acceptList_ be Get(_observerRecord_, `"accept"`).
+    1. ReturnIfAbrupt(_acceptList_).
+    1. Let _deliver_ be ShouldDeliverToObserver(_activeChanges_, _acceptList_, _changeType_).
+    1. If _deliver_ is **false**, continue.
+    1. Otherwise, let _observer_ be Get(_observerRecord_, `"callback"`).
+    1. ReturnIfAbrupt(_observer_).
+    1. Let _pendingRecords_ be the value of _observer_'s [[PendingChangeRecords]] internal slot.
+    1. Append _changeRecord_ to the end of _pendingRecords_.
 
 
 ### CreateChangeRecord(type, object, name, oldDesc, newDesc)
