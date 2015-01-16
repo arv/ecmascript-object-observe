@@ -38,7 +38,7 @@ All Notifier Objects inherit properties from the %NotifierPrototype% intrinsic o
   1. If Type(_O_) is not Object, throw a **TypeError** exception.
   1. If _O_ does not have a [[Target]] internal slot return.
   1. Let _type_ be Get(_changeRecord_, `"type"`).
-  1. ReturnIfAbrubt(_type_).
+  1. ReturnIfAbrupt(_type_).
   1. If Type(_type_) is not string, throw a **TypeError** exception.
   1. Let _target_ be the value of _O_'s [[Target]] internal slot.
   1. Let _newRecord_ be ObjectCreate(%ObjectPrototype%).
@@ -49,7 +49,7 @@ All Notifier Objects inherit properties from the %NotifierPrototype% intrinsic o
   1. Repeat for each element _N_ of _names_ in List order,
     1. If _N_ is not `"object"`, then
       1. Let _value_ be Get(_changeRecord_, _N_).
-      1. ReturnIfAbrubt(_value_).
+      1. ReturnIfAbrupt(_value_).
       1. Let _desc_ be the PropertyDescriptor{[[Value]]: _value_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
       1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _newRecord_ passing _N_ and _desc_ as arguments.
       1. Assert: _success_ is **true**.
@@ -68,7 +68,7 @@ All Notifier Objects inherit properties from the %NotifierPrototype% intrinsic o
   1. Call BeginChange(_target_, _changeType_).
   1. Let _changeRecord_ be the result of calling the [[Call]] internal method of _changeFn_, with **undefined** as _thisArgument_ and an empty List as _argumentsList_.
   1. Call EndChange(_target_, _changeType_).
-  1. ReturnIfAbrubt(_changeRecord_).
+  1. ReturnIfAbrupt(_changeRecord_).
   1. Let _changeObservers_ be the value of _O_'s [[ChangeObservers]] internal slot.
   1. If _changeObservers_ is empty, return.
   1. Let _target_ be the value of _O_'s [[Target]] internal slot.
@@ -83,7 +83,7 @@ All Notifier Objects inherit properties from the %NotifierPrototype% intrinsic o
   1. Repeat for each element _N_ of _names_ in List order,
     1. If _N_ is not `"object"` and _N_ is not `"type"`, then
       1. Let _value_ be Get(_changeRecord_, _N_).
-      1. ReturnIfAbrubt(_value_).
+      1. ReturnIfAbrupt(_value_).
       1. Let _desc_ be the PropertyDescriptor{[[Value]]: _value_, [[Writable]]: **false**, [[Enumerable]]: **true**, [[Configurable]]: **false**}.
       1. Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _newRecord_ passing _N_ and _desc_ as arguments.
       1. Assert: _success_ is **true**.
@@ -114,7 +114,7 @@ When the abstract operation BeginChange is called with Object _O_ and string _ch
   1. Let _notifier_ be GetNotifier(_O_).
   1. Let _activeChanges_ be the value of _notifier_'s [[ActiveChanges]] internal slot.
   1. Let _changeCount_ be Get(_activeChanges_, _changeType_).
-  1. ReturnIfAbrubt(_changeCount_).
+  1. ReturnIfAbrupt(_changeCount_).
   1. If _changeCount_ is **undefined**, let _changeCount_ be 1.
   1. Else, let _changeCount_ be _changeCount_ + 1.
   1. Let _success_ be CreateDataProperty(_activeChanges_, _changeType_, _changeCount_).
@@ -131,7 +131,7 @@ When the abstract operation EndChange is called with Object _O_ and string _chan
   1. Let _notifier_ be GetNotifier(_O_).
   1. Let _activeChanges_ be the value of _notifier_'s [[ActiveChanges]] internal slot.
   1. Let _changeCount_ be Get(_activeChanges_, _changeType_).
-  1. ReturnIfAbrubt(_changeCount_).
+  1. ReturnIfAbrupt(_changeCount_).
   1. Assert: _changeCount_ > 0.
   1. Let _changeCount_ be _changeCount_ - 1.
   1. Let _success_ be CreateDataProperty(_activeChanges_, _changeType_, _changeCount_).
@@ -194,7 +194,7 @@ When the abstract operation DeliverChangeRecords is called with callback _C_, th
     1. Increment _n_ by 1.
   1. If _array_ is empty, return **false**.
   1. Let _status_ be Call(_C_, **undefined**, «_array_»).
-  1. _result_ is intentionall ignored here since. An implementation might choose to log abrubt completions here.
+  1. _result_ is intentionall ignored here since. An implementation might choose to log abrupt completions here.
   1. Return **true**.
 
 Note: The user facing function ''Object.deliverChangeRecords'' returns **''undefined''** to prevent detection if anything was delivered or not.
