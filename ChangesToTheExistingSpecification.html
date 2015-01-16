@@ -1,0 +1,498 @@
+<emu-clause id="modifications">
+  <h1>Modifications to existing internal algorithms</h1>
+  <p>Modifications to existing algorithms are <ins>indicated like this</ins>.</p>
+
+  <emu-clause id="ValidateAndApplyPropertyDescriptor">
+    <h1>9.1.6.3 ValidateAndApplyPropertyDescriptor(O, P, extensible, Desc, current)</h1>
+    <p>When the abstract operation ValidateAndApplyPropertyDescriptor is called with Object O, property key P, Boolean value extensible, and property descriptors Desc, and current the following steps are taken:</p>
+
+    <p>This algorithm contains steps that test various fields of the Property Descriptor Desc for specific values. The fields that are tested in this manner need not actually exist in Desc. If a field is absent then its value is considered to be false.</p>
+
+    <emu-note>If undefined is passed as the O argument only validation is performed and no object updates are performed.</emu-note>
+    <emu-alg>
+      1. Assert: If _O_ is not *undefined* then _P_ is a valid property key.
+      1. <ins>Let _changeType_ be a string, initially set to `"reconfigure"`.</ins>
+      1. If _current_ is *undefined*, then
+        1. If _extensible_ is *false*, then return *false*.
+        1. Assert: _extensible_ is *true*.
+        1. If IsGenericDescriptor(_Desc_) or IsDataDescriptor(_Desc_) is *true*, then
+          1. If _O_ is not *undefined*, then create an own data property named _P_ of object _O_ whose [[Value]], [[Writable]], [[Enumerable]] and [[Configurable]] attribute values are described by Desc. If the value of an attribute field of Desc is absent, the attribute of the newly created property is set to its default value.
+        1. Else Desc must be an accessor Property Descriptor,
+          1. If O is not undefined, then create an own accessor property named P of object O whose [[Get]], [[Set]], [[Enumerable]] and [[Configurable]] attribute values are described by Desc. If the value of an attribute field of Desc is absent, the attribute of the newly created property is set to its default value.
+        1. <ins>Let _R_ be CreateChangeRecord(`"add"`, _O_, _P_, _current_, _Desc_).</ins>
+        1. <ins>Call EnqueueChangeRecord(_O_, _R_).</ins>
+        1. Return true.
+      1. Return true, if every field in Desc is absent.
+      1. Return true, if every field in Desc also occurs in current and the value of every field in Desc is the same value as the corresponding field in current when compared using the SameValue algorithm.
+      1. If the [[Configurable]] field of current is false then
+        1. Return false, if the [[Configurable]] field of Desc is true.
+        1. Return false, if the [[Enumerable]] field of Desc is present and the [[Enumerable]] fields of current and Desc are the Boolean negation of each other.
+      1. If IsGenericDescriptor(Desc) is true, then no further validation is required.
+      1. Else if IsDataDescriptor(current) and IsDataDescriptor(Desc) have different results, then
+        1. Return false, if the [[Configurable]] field of current is false.
+        1. If IsDataDescriptor(current) is true, then
+          1. If O is not undefined, then convert the property named P of object O from a data property to an accessor property. Preserve the existing values of the converted property’s [[Configurable]] and [[Enumerable]] attributes and set the rest of the property’s attributes to their default values.
+        1. Else,
+          1. If O is not undefined, then convert the property named P of object O from an accessor property to a data property. Preserve the existing values of the converted property’s [[Configurable]] and [[Enumerable]] attributes and set the rest of the property’s attributes to their default values.
+      1. Else if IsDataDescriptor(current) and IsDataDescriptor(Desc) are both true, then
+        1. If the [[Configurable]] field of current is false, then
+          1. Return false, if the [[Writable]] field of current is false and the [[Writable]] field of Desc is true.
+          1. If the [[Writable]] field of current is false, then
+            1. Return false, if the [[Value]] field of Desc is present and SameValue(Desc.[[Value]], current.[[Value]]) is false.
+        1. else the [[Configurable]] field of current is true, so any change is acceptable.
+        1. <ins>If [[Configurable]] is not in _Desc_ or SameValue(Desc.[[Configurable]], _current_.[[Configurable]]) is *true* and [[Enumerable]] is not in _Desc_ or SameValue(_Desc_.[[Enumerable]], _current_.[[Enumerable]]) is true and [[Writable]] is not  in Desc or SameValue(Desc.[[Writable]], _current_.[[Writable]]) is *true*, then</ins>
+          1. <ins>Let _changeType_ to be the string `"update"`.</ins>
+      1. Else IsAccessorDescriptor(current) and IsAccessorDescriptor(Desc) are both true,
+        1. If the [[Configurable]] field of current is false, then
+          1. Return false, if the [[Set]] field of Desc is present and SameValue(Desc.[[Set]], current.[[Set]]) is false.
+          1. Return false, if the [[Get]] field of Desc is present and SameValue(Desc.[[Get]], current.[[Get]]) is false.
+      1. If O is not undefined, then
+        1. For each attribute field of Desc that is present, set the correspondingly named attribute of the property named P of object O to the value of the field.
+      1. <ins>Let _R_ be CreateChangeRecord(_changeType_, _O_, _P_, _current_, _Desc_).</ins>
+      1. <ins>Call EnqueueChangeRecord(_O_, _R_).</ins>
+      1. Return true.
+    </emu-alg>
+  </emu-clause>
+
+  <emu-clause id="Delete">
+    <h1>9.1.10 [[Delete]] (P)</h1>
+
+    <p>When the [[Delete]] internal method of _O_ is called with property key _P_ the following steps are taken:</p>
+
+    <emu-alg>
+      1. Assert: IsPropertyKey(_P_) is *true*.
+      1. Let _desc_ be the result of calling the [GetOwnProperty]] internal method of _O_ with argument _P_.
+      1. ReturnIfAbrupt(_desc_).
+      1. If _desc_ is *undefined*, then return *true*.
+      1. <ins>Let _notifier_ be GetNotifier(_O_).</ins>
+      1. If _desc_.[[Configurable]] is *true*, then
+        1. Remove the own property with name _P_ from _O_.
+        1. <ins>Let _R_ be CreateChangeRecord(`"delete"`, _O_, _P_, _desc_).</ins>
+        1. <ins>Call EnqueueChangeRecord(_O_ and _R_).</ins>
+        1. Return *true*.
+      1. Return false.
+    </emu-alg>
+  </emu-clause>
+
+  <emu-clause id="PreventExtensions">
+    <h1>9.1.4 [[PreventExtensions]] ()</h1>
+
+    <p>When the [[PreventExtensions]] internal method of _O_ is called the following steps are taken:</p>
+
+    <emu-alg>
+      1. <ins>Let _wasExtensible_ be the value of _O_'s [[Extensible]] internal slot.</ins>
+      1. Set the value of the [[Extensible]] internal slot of _O_ to *false*.
+      1. If _wasExtensible_ is *false*, return *true*.
+      1. <ins>Let _notifier_ be GetNotifier(_O_).</ins>
+      1. <ins>Let _R_ be CreateChangeRecord(`"preventExtensions"`, _O_).</ins>
+      1. <ins>Call EnqueueChangeRecord(_O_, _R_).</ins>
+      1. Return *true*.
+    </emu-alg>
+  </emu-clause>
+
+  <emu-clause id="SetPrototypeOf">
+    <h1>9.1.2 `[[SetPrototypeOf]] (V)`</h1>
+
+    <p>When the [[SetPrototypeOf]] internal method of _O_ is called with argument _V_ the following steps are taken:</p>
+
+    <emu-alg>
+      1. Assert: Either Type(_V_) is Object or Type(_V_) is Null.
+      1. Let _extensible_ be the value of the [[Extensible]] internal slot of _O_.
+      1. Let _current_ be the value of the [[Prototype]] internal slot of _O_.
+      1. If SameValue(_V_, _current_), then return *true*.
+      1. If _extensible_ is *false*, then return *false*.
+      1. If _V_ is not *null*, then
+        1. Let _p_ be _V_.
+        1. Repeat, while _p_ is not *null*
+          1. If SameValue(_p_, _O_) is *true*, then return *false*.
+          1. Let _nextp_ be the result of calling the [[GetPrototypeOf]] internal method of _p_ with no arguments.
+          1. ReturnIfAbrupt(_nextp_).
+          1. Let _p_ be _nextp_.
+      1. Let _extensible_ be the value of the [[Extensible]] internal slot of _O_.
+      1. If _extensible_ is *false*, then
+        1. Let _current2_ be the value of the [[Prototype]] internal slot of _O_.
+        1. If SameValue(_V_, _current2_) is *true*, then return *true*.
+        1. Return *false*.
+      1. Set the value of the [[Prototype]] internal slot of _O_ to _V_.
+      1. <ins>Let _notifier_ be GetNotifier(_O_).</ins>
+      1. <ins>Let _R_ be ObjectCreate(%ObjectPrototype%).</ins>
+      1. <ins>Let _desc_ be the PropertyDescriptor{[[Value]]: `"setPrototype"`, [[Writable]]: *false*, [[Enumerable]]: *true*, [[Configurable]]: *false*}.</ins>
+      1. <ins>Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _R_ passing `"type"` and _desc_ as arguments.</ins>
+      1. <ins>Assert: _success_ is *true*.</ins>
+      1. <ins>Let _desc_ be the PropertyDescriptor{[[Value]]: _O_, [[Writable]]: *false*, [[Enumerable]]: *true*, [[Configurable]]: *false*}.</ins>
+      1. <ins>Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _R_ passing `"object"` and _desc_ as arguments.</ins>
+      1. <ins>Assert: _success_ is *true*.</ins>
+      1. <ins>Let _desc_ be the PropertyDescriptor{[[Value]]: _current_, [[Writable]]: *false*, [[Enumerable]]: *true*, [[Configurable]]: *false*}.</ins>
+      1. <ins>Let _success_ be the result of calling the [[DefineOwnProperty]] internal method of _R_ passing `"oldValue"` and _desc_ as arguments.</ins>
+      1. <ins>Assert: _success_ is *true*.</ins>
+      1. <ins>Set the [[Extensible]] internal slot of _R_ to *false*.</ins>
+      1. <ins>Call EnqueueChangeRecord(_O_, _R_).</ins>
+      1. Return *true*.
+    </emu-alg>
+  </emu-clause>
+  <emu-clause id="Array-changes">
+    <h1>Changes to Array methods</h1>
+    <emu-clause id="Array.prototype.pop">
+      <h1>Array.prototype.pop</h1>
+
+      <p>22.1.3.16 Array.prototype.pop ()</p>
+
+      <p>The last element of the array is removed from the array and returned.</p>
+
+      <emu-alg>
+        1. Let O be the result of calling ToObject passing the this value as the argument.
+        1. ReturnIfAbrupt(O).
+        1. Let lenVal be the result of Get(O, "length").
+        1. Let len be ToUint32(lenVal).
+        1. ReturnIfAbrupt(len).
+        1. If len is zero, 
+          1. Let putStatus be the result of Put(O, "length", 0, true).
+          1. ReturnIfAbrupt(putStatus).
+          1. Return undefined.
+        1. Else, len > 0
+          1. Let newLen be len–1.
+          1. Let indx be ToString(newLen).
+          1. <ins>Call the [[BeginChange]] internal passing O and "splice".</ins>
+          1. Let element be the result of Get(O, indx).
+          1. ReturnIfAbrupt(element).
+          1. Let deleteStatus be the result of DeletePropertyOrThrow(O, indx).
+          1. <ins>If deleteStatus.[[type]] is normal, let putStatus be the result of Put(O, "length", newLen, true).</ins>
+          1. <ins>Call the [[EndChange]] internal passing O and "splice".</ins>
+          1. <ins>Let elements be a new List.</ins>
+          1. <ins>Append element to the end of elements.</ins>
+          1. <ins>Let removed be the result of CreateArrayFromList(elements).</ins>
+          1. <ins>Let R be the result of calling [[CreateSpliceChangeRecord]] with arguments: O, newLen, removed and 0.</ins>
+          1. <ins>Call [[EnqueueChangeRecord]] passing O and R</ins>
+          1. ReturnIfAbrupt(deleteStatus)
+          1. ReturnIfAbrupt(putStatus)
+          1. Return element.
+      </emu-alg>
+    </emu-clause>
+    <emu-clause id="Array.prototype.push">
+      <h1>Array.prototype.push</h1>
+
+      <p>22.1.3.17 Array.prototype.push ( [ item1 [ , item2 [ , … ] ] ] )</p>
+
+      <p>The arguments are appended to the end of the array, in the order in which they appear. The new length of the  array is returned as the result of the call.</p>
+
+      <p>When the push method is called with zero or more arguments item1, item2, etc., the following steps are taken:</p>
+
+      <emu-alg>
+        1. Let O be the result of calling ToObject passing the this value as the argument.
+        1. ReturnIfAbrupt(O).
+        1. Let lenVal be the result of Get(O, "length").
+        1. Let n be ToLength(lenVal).
+        1. ReturnIfAbrupt(n).
+        1. <ins>Let putStatus be n.</ins>
+        1. Let items be an internal List whose elements are, in left to right order, the arguments that were passed to this function invocation.
+        1. <ins>Let _numAdded_ be the length of the _items_ list.</ins>
+        1. <ins>Call the [[BeginChange]] internal method passing O and "splice".</ins>
+        1. <ins>Repeat, while items is not empty and status.[[type]] is normal</ins>
+          1. Remove the first element from items and let E be the value of the element.
+          1. Let putStatus be the result of Put(O, ToString(n), E, true).
+          1. <ins>If putStatus.[[type]] is normal, increase n by 1.</ins>
+        1. <ins>If putStatus.[[type]] is normal, let putStatus be the result of Put(O, "length", n, true).</ins>
+        1. <ins>Call the [[EndChange]] internal method passing O and "splice".</ins>
+        1. <ins>Let removed be the result of ArrayCreate(0).</ins>
+        1. <ins>Let R be the result of calling [[CreateSpliceChangeRecord]] with arguments: O, lenVal, removed and numAdded.</ins>
+        1. <ins>Call [[EnqueueChangeRecord]] passing O and R</ins>
+        1. ReturnIfAbrupt(putStatus)
+        1. Return n.
+      </emu-alg>
+    </emu-clause>
+
+    <emu-clause id="Array.prototype.shift">
+      <h1>Array.prototype.shift</h1>
+
+      <p>22.1.3.21 Array.prototype.shift ( )</p>
+
+      <p>The first element of the array is removed from the array and returned.</p>
+      <emu-alg>
+        1. Let O be the result of calling ToObject passing the this value as the argument.
+        1. ReturnIfAbrupt(O).
+        1. Let lenVal be the result of Get(O, "length").
+        1. Let len be ToLength(lenVal).
+        1. ReturnIfAbrupt(len).
+        1. If len is zero, then
+          1. Let putStatus be the result of Put(O, "length", 0, true).
+          1. ReturnIfAbrupt(putStatus).
+          1. Return undefined.
+        1. <ins>Call the [[BeginChange]] internal method passing O and "splice".</ins>
+        1. Let first be the result of Get(O, "0").
+        1. ReturnIfAbrupt(first).
+        1. <ins>Let status be first</ins>
+        1. Let k be 1.
+        1. <ins>Repeat, while status.[[type]] is normal and k < len</ins>
+          1. Let from be ToString(k).
+          1. Let to be ToString(k–1).
+          1. Let fromPresent be the result of HasProperty(O, from).
+          1. Let status be fromPresent.
+          1. <ins>If status.[[type]] is normal</ins>
+            1. If fromPresent is true, then
+              1. Let fromVal be the result of Get(O, from).
+              1. <ins>Let status be fromVal.</ins>
+              1. <ins>If status.[[type]] is normal, let putStatus be the result of Put(O, to, fromVal, true).</ins>
+            1. Else, fromPresent is false
+              1. Let status be the result of DeletePropertyOrThrow(O, to).
+            1. Increase k by 1.
+        1. <ins>If status.[[type]] is normal, let status be the result of DeletePropertyOrThrow(O, ToString(len–1)).</ins>
+        1. <ins>If status.[[type]] is normal, let status be the result of Put(O, "length", len–1, true).</ins>
+        1. <ins>Call the [[EndChange]] internal method passing O and "splice".</ins>
+        1. <ins>Let elements be a new List.</ins>
+        1. <ins>Append first to the end of elements.</ins>
+        1. <ins>Let removed be the result of CreateArrayFromList(elements).</ins>
+        1. <ins>Let R be the result of calling [[CreateSpliceChangeRecord]] with arguments: O, 0, removed and 0.</ins>
+        1. <ins>Call [[EnqueueChangeRecord]] passing O and R.</ins>
+        1. ReturnIfAbrupt(status).
+        1. Return first.
+      </emu-alg>
+    </emu-clause>
+    <emu-clause id="Array.prototype.splice">
+      <h1>Array.prototype.splice</h1>
+
+      <p>22.1.3.25 Array.prototype.splice (start, deleteCount [ , item1 [ , item2 [ , … ] ] ] )</p>
+
+      <p>When the splice method is called with two or more arguments start, deleteCount and (optionally) item1, item2, etc., the deleteCount elements of the array starting at array index start are replaced by the arguments item1, item2, etc. An Array object containing the deleted elements (if any) is returned. The following steps are taken:</p>
+
+      <emu-alg>
+        1. Let O be the result of calling ToObject passing the this value as the argument.
+        1. ReturnIfAbrupt(O).
+        1. Let lenVal be the result of Get(O, "length")
+        1. Let len be ToLength(lenVal).
+        1. ReturnIfAbrupt(len).
+        1. Let relativeStart be ToInteger(start).
+        1. ReturnIfAbrupt(relativeStart).
+        1. If relativeStart is negative, let actualStart be max( (len + relativeStart), 0); else let actualStart be min(relativeStart, len).
+        1. If start is not present, then
+          1. Let actualDeleteCount be 0.
+        1. Else if deleteCount is not present, then
+          1. Let actualDeleteCount be len - actualStart
+        1. Else,
+          1. Let dc be ToInteger(deleteCount).
+          1. ReturnIfAbrupt(dc).
+          1. Let actualDeleteCount be min(max(dc, 0), len - actualStart).
+        1. Let A be undefined.
+        1. If O is an exotic Array object, then
+          1. Let C be the result of Get(O, "constructor").
+          1. ReturnIfAbrupt(C).
+          1. If IsConstructor(C) is true, then
+            1. Let thisRealm be the running execution context's Realm.
+            1. If thisRealm and the value of C's [[Realm]] internal slot are the same value, then
+              1. Let A be the result of calling the [[Construct]] internal method of C with argument (actualDeleteCount).
+        1. If A is undefined, then
+          1. Let A be the result of the abstract operation ArrayCreate with the argument actualDeleteCount.
+        1. ReturnIfAbrupt(A).
+        1. Let k be 0.
+        1. <ins>Call the [[BeginChange]] internal method passing O and "splice".</ins>
+        1. <ins>Let deletedItems be a new List.</ins>
+        1. <ins>Let status be relativeStart.</ins>
+        1. <ins>Repeat, while status.[[type]] is normal and k < actualDeleteCount</ins>
+          1. Let from be ToString(actualStart+k).
+          1. Let fromPresent be the result of HasProperty(O, from).
+          1. <ins>Let status be fromPresent.</ins>
+          1. <ins>If status.[[type]] is normal, then</ins>
+            1. If fromPresent is true, then
+              1. Let fromValue be the result of Get(O, from).
+              1. <ins>Let status be fromValue.</ins>
+              1. <ins>If status.[[type]] is normal, then</ins>
+                1. <ins>Let status be the result of CreateDataPropertyOrThrow(A, ToString(k), fromValue).</ins>
+                1. <ins>Append fromValue to the end of deletedItems.</ins>
+            1. Increment k by 1.
+        1. <ins>If status.[[type]] is not throw, let status be the result of Put(A, "length", actualDeleteCount, true).</ins>
+        1. <ins>If status.[[type]] is not throw, then</ins>
+          1. Let items be an internal List whose elements are, in left to right order, the portion of the actual argument list starting with item1. The list will be empty if no such items are present.
+          1. Let itemCount be the number of elements in items.
+        1. If status.[[type]] is not throw and itemCount < actualDeleteCount, then
+          1. Let k be actualStart.
+          1. <ins>Repeat, while status.[[type]] is normal and k < (len – actualDeleteCount)</ins>
+            1. Let from be ToString(k+actualDeleteCount).
+            1. Let to be ToString(k+itemCount).
+            1. Let fromPresent be the result of HasProperty(O, from).
+            1. <ins>Let status be fromPresent.</ins>
+            1. <ins>If status.[[type]] is normal, then</ins>
+              1. If fromPresent is true, then
+                1. Let fromValue be the result of Get(O, from).
+                1. <ins>Let status be fromValue.</ins>
+                1. <ins>If status.[[type]] is normal, let status be the result of Put(O, to, fromValue, true).</ins>
+              1. Else, fromPresent is false
+                1. Let status be the result of DeletePropertyOrThrow(O, to).
+              1. <ins>If status.[[type]] is normal, Increase k by 1.</ins>
+          1. <ins>If status.[[type]] is normal, Let k be len.</ins>
+          1. <ins>Repeat, while status.[[type]] is normal and k > (len – actualDeleteCount + itemCount)</ins>
+            1. Let status be the result of DeletePropertyOrThrow(O, ToString(k–1)).
+            1. <ins>If status.[[type]] is normal, decrease k by 1.</ins>
+        1. <ins>Else if status.[[type]] is normal and itemCount > actualDeleteCount, then</ins>
+          1. Let k be (len – actualDeleteCount).
+          1. <ins>Repeat, while status.[[type]] is normal and k > actualStart</ins>
+            1. Let from be ToString(k + actualDeleteCount – 1).
+            1. Let to be ToString(k + itemCount – 1)
+            1. Let fromPresent be the result of HasProperty(O, from).
+            1. <ins>Let status be fromPresent.</ins>
+            1. <ins>If status.[[type]] is normal, then</ins>
+              1. If fromPresent is true, then
+                1. Let fromValue be the result of Get(O, from).
+                1. <ins>Let status be fromValue.</ins>
+                1. <ins>If status.[[type]] is normal, let status be the result of Put(O, to, fromValue, true).</ins>
+              1. Else fromPresent is false,
+                1. Let status be the result of DeletePropertyOrThrow(O, to).
+              1. <ins>If status.[[type]] is normal, decrease k by 1.</ins>
+        1. <ins>If status.[[type]] is normal, then</ins>
+          1. Let k be actualStart.
+          1. <ins>Repeat, while status.[[type]] is normal and items is not empty</ins>
+            1. Remove the first element from items and let E be the value of that element.
+            1. Let status be the result of Put(O, ToString(k), E, true).
+            1. <ins>If status.[[type]] is normal, increase k by 1.</ins>
+          1. Let status be the result of Put(O, "length", len – actualDeleteCount + itemCount, true).
+        1. <ins>Call the [[EndChange]] internal method passing O and "splice".</ins>
+        1. <ins>Let  removed be CreateArrayFromList(deletedItems).</ins>
+        1. <ins>Let R be the result of calling [[CreateSpliceChangeRecord]] with arguments: O, actualStart, removed and itemCount.</ins>
+        1. <ins>Call [[EnqueueChangeRecord]] passing O and R</ins>
+        1. ReturnIfAbrupt(status)
+        1. Return A.
+      </emu-alg>
+    </emu-clause>
+    <emu-clause id="Array.prototype.unshift">
+      <h1>Array.prototype.unshift</h1>
+
+      <p>22.1.3.28 Array.prototype.unshift ( [ item1 [ , item2 [ , … ] ] ] )</p>
+
+      <p>The arguments are prepended to the start of the array, such that their order within the array is the same as the order in which they appear in the argument list.</p>
+
+      <p>When the unshift method is called with zero or more arguments item1, item2, etc., the following steps are taken:</p>
+
+      <emu-alg>
+        1. Let O be the result of calling ToObject passing the this value as the argument.
+        1. ReturnIfAbrupt(O).
+        1. Let lenVal be the result of Get(O, "length")
+        1. Let len be ToLength(lenVal).
+        1. ReturnIfAbrupt(len).
+        1. Let argCount be the number of actual arguments.
+        1. Let k be len.
+        1. <ins>Let status be len.</ins>
+        1. <ins>Call the [[BeginChange]] internal method passing O and "splice".</ins>
+        1. <ins>Repeat, while status.[[type]] is normal and k > 0,</ins>
+          1. Let from be ToString(k–1).
+          1. Let to be ToString(k+argCount –1).
+          1. Let fromPresent be the result of HasProperty(O, from).
+          1. <ins>Let status be fromPresent.</ins>
+          1. <ins>If status.[[type]] is normal, then</ins>
+            1. If fromPresent is true, then
+              1. Let fromValue be the result of Get(O, from).
+              1. <ins>Let status be fromValue.</ins>
+              1. <ins>If status.[[type]] is normal, let putStatus be the result of Put(O, to, fromValue, true).</ins>
+              1. <ins>Let status be putStatus.</ins>
+            1. Else, fromPresent is false
+              1. Let deleteStatus be the result of DeletePropertyOrThrow(O, to).
+              1. <ins>Let status be deleteStatus.</ins>
+            1. If status.[[type]] is not throw, decrease k by 1.
+        1. <ins>If status.[[type]] is normal, then</ins>
+          1. Let j be 0.
+          1. Let items be a List whose elements are, in left to right order, the arguments that were passed to this function invocation.
+        1. <ins>Repeat, while status.[[type]] is normal and items is not empty</ins>
+          1. Remove the first element from items and let E be the value of that element.
+          1. Let status be the result of Put(O, ToString(j), E, true).
+          1. <ins>If status.[[type]] is normal, increase j by 1.</ins>
+        1. Let status be the result of Put(O, "length", len+argCount, true).
+        1. <ins>Call the [[EndChange]] internal method passing O and "splice".</ins>
+        1. <ins>Let removed be the result of ArrayCreate(0).</ins>
+        1. <ins>Let R be the result of calling [[CreateSpliceChangeRecord]] with arguments: O, 0, removed and argCount.</ins>
+        1. <ins>Call [[EnqueueChangeRecord]] passing O and R.</ins>
+        1. ReturnIfAbrupt(status)
+        1. Return len+argCount.
+      </emu-alg>
+    </emu-clause>
+  </emu-clause>
+  <emu-clause id="Array-instance-changes">
+    <h1>Array Exotic Objects</h1>
+
+    <emu-clause id="DefineOwnProperty">
+      <h1>[[DefineOwnProperty]] (P, Desc)</h1>
+
+      <p>9.4.2.1 [[DefineOwnProperty]] (P, Desc)</p>
+
+      <p>When the [[DefineOwnProperty]] internal method of an exotic Array object A is called with property P, and Property Descriptor Desc the following steps are taken:</p>
+
+      <emu-alg>
+        1. Assert: IsPropertyKey(P) is true.
+        1. If P is "length", then
+          1. Return the result of calling ArraySetLength with arguments A, and Desc.
+        1. Else if P is an array index, then
+          1. Let oldLenDesc be the result of calling the [[GetOwnProperty]] internal method of A passing "length" as the argument. The result will never be undefined or an accessor descriptor because Array objects are created with a length data property that cannot be deleted or reconfigured.
+          1. Let oldLen be oldLenDesc.[[Value]].
+          1. Let index be ToUint32(P).
+          1. Assert: index will never be an abrupt completion.
+          1. If index ≥ oldLen and oldLenDesc.[[Writable]] is false, then return false.
+          1. Let succeeded be the result of calling OrdinaryDefineOwnProperty passing A, P, and Desc as arguments.
+          1. ReturnIfAbrupt(succeeded).
+          1. If succeeded is false, then return false.
+          1. If index ≥ oldLen
+            1. Set oldLenDesc.[[Value]] to index + 1.
+            1. Let succeeded be the result of calling OrdinaryDefineOwnProperty passing A, "length", and oldLenDesc as arguments.
+            1. ReturnIfAbrupt(succeeded).
+            1. <ins>Call the [[BeginChange]] internal method passing A and "splice".</ins>
+            1. <ins>Call the [[EndChange]] internal method passing A and "splice".</ins>
+            1. <ins>Let removed be the result of ArrayCreate(0).</ins>
+            1. <ins>Let R be the result of calling [[CreateSpliceChangeRecord]] with arguments: A, oldLen, removed and (index + 1 - oldLen).</ins>
+            1. <ins>Call [[EnqueueChangeRecord]] passing A and R</ins>
+          1. Return true.
+        1. Return the result of calling OrdinaryDefineOwnProperty passing A, P, and Desc as arguments.
+      </emu-alg>
+    </emu-clause>
+    <emu-clause id="ArraySetLength">
+      <h1>ArraySetLength Abstract Operation</h1>
+
+      <p>9.4.2.2 ArraySetLength Abstract Operation</p>
+
+      <p>When the abstract operation ArraySetLength is called with an exotic Array object A, and Property Descriptor Desc the following steps are taken:</p>
+
+      <emu-alg>
+        1. If the [[Value]] field of Desc is absent, then
+          1. Return the result of calling OrdinaryDefineOwnProperty passing A, "length", and Desc as arguments.
+        1. Let newLenDesc be a copy of Desc.
+        1. Let newLen be ToUint32(Desc.[[Value]]).
+        1. If newLen is not equal to ToNumber( Desc.[[Value]]), throw a RangeError exception.
+        1. Set newLenDesc.[[Value]] to newLen.
+        1. Let oldLenDesc be the result of calling the [[GetOwnProperty]] internal method of A passing "length" as the argument. The result will never be undefined or an accessor descriptor because Array objects are created with a length data property that cannot be deleted or reconfigured.
+        1. Let oldLen be oldLenDesc.[[Value]].
+        1. If newLen ≥oldLen, then
+          1. Return the result of calling OrdinaryDefineOwnProperty passing A, "length", and newLenDesc as arguments.
+        1. If oldLenDesc.[[Writable]] is false, then return false.
+        1. If newLenDesc.[[Writable]] is absent or has the value true, let newWritable be true.
+        1. Else,
+          1. Need to defer setting the [[Writable]] attribute to false in case any elements cannot be deleted.
+          1. Let newWritable be false.
+          1. Set newLenDesc.[[Writable]] to true.
+        1. Let succeeded be the result of calling OrdinaryDefineOwnProperty passing A, "length", and newLenDesc as arguments.
+        1. ReturnIfAbrupt(succeeded).
+        1. If succeeded is false, return false.
+        1. <ins>Call the [[BeginChange]] internal method passing A and "splice".</ins>
+        1. <ins>Let removedList be a new List.</ins>
+        1. <ins>Let status be succeeded.</ins>
+        1. <ins>Let numAdded be newLen - oldLen.</ins>
+        1. <ins>If numAdded < 0, then let numAdded be 0.</ins>
+        1. <ins>While status.[[type]] is normal and newLen < oldLen repeat,</ins>
+          1. Set oldLen to oldLen – 1.
+          1. <ins>Let oldValue be the result of Get(A, ToString(oldLen)).</ins>
+          1. <ins>Let status be oldValue.</ins>
+          1. <ins>If status.[[type]] is normal, then</ins>
+            1. <ins>Add oldValue to the front of removedList.</ins>
+            1. Let deleteSucceeded be the result of calling the [[Delete]] internal method of A passing ToString(oldLen).
+            1. <ins>Let status be deleteSucceeded.</ins>
+            1. If deleteSucceeded is false, then
+              1. Set newLenDesc.[[Value]] to oldLen+1.
+              1. If newWritable is false, set newLenDesc.[[Writable]] to false.
+              1. <ins>Let status be the result of calling OrdinaryDefineOwnProperty passing A, "length", and newLenDesc as arguments.</ins>
+              1. <ins>If status.[[type]] is normal, then</ins>
+                1. Return false.
+        1. <ins>If status.[[type]] is normal and newWritable is false, then</ins>
+          1. Call OrdinaryDefineOwnProperty passing A, "length", and Property Descriptor{[[Writable]]: false} as arguments. This call will always return true.
+        1. <ins>Call the [[EndChange]] internal passing A and "splice".</ins>
+        1. <ins>Let removed be the result of ArrayCreateFromList(removedList).</ins>
+        1. <ins>Let R be the result of calling [[CreateSpliceChangeRecord]] with arguments: A, newLen, removed and numAdded.</ins>
+        1. <ins>Call [[EnqueueChangeRecord]] passing A and R.</ins>
+        1. ReturnIfAbrupt(status)
+        1. Return true.
+      </emu-alg>
+    </emu-clause>
+  </emu-clause>
+</emu-clause>
