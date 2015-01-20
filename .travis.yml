@@ -1,0 +1,8 @@
+script: bash ./deploy.sh
+env:
+  global:
+  - GH_REF: github.com/arv/ecmascript-object-observe.git
+  - secure: No03HF8b1We0a5H3l1yQMXjjXPUgLNVyoky5W+Y2TOADOabhGS+wqgZfchLhQ7O4BzJK/wi+jHNP+FqHi2DA/9Q90XyWuIAf3HQrj1RTPH8UUaFS1OewlIVoXPDlE+CG5Y5WN0lpbtbAuj1l+u6KRfgO3QALqMgn2vRttOF5dRU=
+language: node_js
+node_js:
+- '0.10'
