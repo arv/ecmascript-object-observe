@@ -1,8 +1,9 @@
-# Object.observe: API Usage Example
+<emu-intro id="examples">
+  <h1>Examples</h1>
 
-## Basic
-
-```js
+  <emu-intro id="examples-basic">
+    <h1>Basic</h1>
+    <pre><code class="language-javascript">
 var records;
 function observer(recs) {
   records = recs;
@@ -25,11 +26,12 @@ assertChangesAre(records, [
   { object: obj, type: 'delete', name: 'a', oldValue: 'b' },
   { object: obj, type: 'preventExtensions', }
 ]);
-```
+    </code></pre>
+  </emu-intro>
 
-## Array
-
-```js
+  <emu-intro id="examples-array">
+    <h1>Array</h1>
+    <pre><code class="language-javascript">
 var basicChanges;
 function basicObserver(recs) {
   basicChanges = recs;
@@ -79,11 +81,12 @@ assertChangesAre(arrayChanges, [
   // length assignment
   { object: array, type: 'splice', index: 0, removed: [1, 2,,,,'a'], addedCount: 0 },
 ]);
-```
+    </code></pre>
+  </emu-intro>
 
-## Synthetic Change Records
-
-```js
+  <emu-intro id="examples-synthetic">
+    <h1>Synthetic Change Records</h1>
+    <pre><code class="language-javascript">
 function Circle(r) {
   var radius = r;
 
@@ -146,13 +149,11 @@ assertChangesAre(changes, [
   { object: circle, type: 'update', name: 'radius', oldValue: 10 },
   { object: circle, type: 'update', name: 'area', oldValue: 986.9604401089358 },
 ]);
-```
-
-
-
-## Higher-level change records
-
-```js
+    </code></pre>
+  </emu-intro>
+  <emu-intro id="examples-higher-synthetic">
+    <h1>Higher-level Change Records</h1>
+    <pre><code class="language-javascript">
 function Square(x, y, width, height) {
   this.x = x;
   this.y = y;
@@ -227,4 +228,6 @@ assertChangesAre(squareChanges, [
   // scale
   { object: square, type: 'scale', ratio: 2 },
 ]);
-```
+    </code></pre>
+  </emu-intro>
+</emu-intro>
