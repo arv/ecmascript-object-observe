@@ -28,12 +28,14 @@
           1. Let _nextIndex_ be _nextIndex_ + 1.
       1. Let _skipRecordsValue_ be GetOption(_options_, `"skipRecords"`).
       1. ReturnIfAbrupt(_skipRecordsValue_).
+      1. Let _skipRecords_ be ToBoolean(_skipRecordsValue_).
       1. Let _notifier_ be GetNotifier(_O_).
       1. Let _changeObservers_ be the value of _notifier_`s [[ChangeObservers]] internal slot.
-      1. If _changeObservers_ already contains a _record_ whose _callback_ property is the same as _callback_, then
+      1. If _changeObservers_ already contains a _record_ whose [[Callback]] field is the same as _callback_, then
         1. Set _record_.[[Accept]] to _acceptList_.
+        1. Set _record_.[[Skip]] to _skipRecords_.
         1. Return _O_.
-      1. Let _observerRecord_ be Record{[[Callback]]: _callback_, [[Accept]: _acceptList_}.
+      1. Let _observerRecord_ be Record{[[Callback]]: _callback_, [[Accept]: _acceptList_, [[Skip]]: _skipRecords_}.
       1. Append _observerRecord_ to the end of the _changeObservers_ list.
       1. Let _observerCallbacks_ be [[ObserverCallbacks]].
       1. If _observerCallbacks_ already contains _callback_, return _O_.
@@ -58,9 +60,7 @@
   <emu-clause id="Array.observe">
     <h1>Array.observe(O, callback, options = undefined</h1>
 
-    <p>A new function Array.observe is added, which is equivalent to</p>
-    <!-- TODO(arv): Use a real spec algorithm here. Refactor Object.observe into
-    a new spec algorithm that is shared between these two. -->
+    <p>A new function Array.observe is added, which is equivalent to. <ins>TODO(arv) Use a real spec algorithm here. Refactor Object.observe into a new spec algorithm that is shared between these two.</ins></p>
 
     <pre>
 function(O, callback,
@@ -90,7 +90,7 @@ function(O, callback) {
 
     <p>When the `deliverChangeRecords` method is called with argument _callback_, the following steps are taken:</p>
     <emu-alg>
-      1. If IsCallable(_callback_) is *false*, throw a *TypeError* exception.
+      1. If IsCallable(_callback_) is *true*, throw a *TypeError* exception.
       1. Repeat
         1. Let _result_ be DeliverChangeRecords(_callback_).
         1. If _result_ is *false* return.
