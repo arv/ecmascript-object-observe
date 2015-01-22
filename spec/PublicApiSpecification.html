@@ -1,12 +1,14 @@
 <emu-clause id="public-api-specification">
   <h1>Public API Specification</h1>
   <emu-clause id="Object.observe">
-    <h1>Object.observe(O, callback, accept = undefined)</h1>
-    <p>When the `observe` method is called with arguments Object _O_, function _callback_ and _accept_ the following steps are taken:</p>
+    <h1>Object.observe(O, callback, options = undefined)</h1>
+    <p>When the `observe` method is called with arguments Object _O_, function _callback_ and _options_ the following steps are taken:</p>
     <emu-alg>
       1. If Type(_O_) is not Object, throw a *TypeError* exception.
       1. If IsCallable(_callback_) is *false*, throw a *TypeError* exception.
       1. If TestIntegrityLevel(_callback_, `"frozen"`) is *true*, throw a *TypeError* exception.
+      1. Let _accept_ be GetOption(_options_, `"acceptTypes"`).
+      1. ReturnIfAbrupt(_accept_).
       1. If _accept_ is *undefined*, then
         1. Let _acceptList_ be a new List containing `"add"`, `"update"`, `"delete"`, `"reconfigure"`, `"setPrototype"` and `"preventExtensions"`.
       1. Else
@@ -24,14 +26,14 @@
           1. ReturnIfAbrupt(_nextString_).
           1. Append _nextString_ to _acceptList_.
           1. Let _nextIndex_ be _nextIndex_ + 1.
+      1. Let _skipRecordsValue_ be GetOption(_options_, `"skipRecords"`).
+      1. ReturnIfAbrupt(_skipRecordsValue_).
       1. Let _notifier_ be GetNotifier(_O_).
       1. Let _changeObservers_ be the value of _notifier_`s [[ChangeObservers]] internal slot.
       1. If _changeObservers_ already contains a _record_ whose _callback_ property is the same as _callback_, then
-        1. Call CreateDataProperty(_record_, `"accept"`, _acceptList_).
+        1. Set _record_.[[Accept]] to _acceptList_.
         1. Return _O_.
-      1. Let _observerRecord_ be ObjectCreate(%ObjectPrototype%).
-      1. Perform CreateDataProperty(_observerRecord_, `"callback"`, _callback_).
-      1. Perform CreateDataProperty(_observerRecord_, `"accept"`, _acceptList_).
+      1. Let _observerRecord_ be Record{[[Callback]]: _callback_, [[Accept]: _acceptList_}.
       1. Append _observerRecord_ to the end of the _changeObservers_ list.
       1. Let _observerCallbacks_ be [[ObserverCallbacks]].
       1. If _observerCallbacks_ already contains _callback_, return _O_.
@@ -54,17 +56,23 @@
     </emu-alg>
   </emu-clause>
   <emu-clause id="Array.observe">
-    <h1>Array.observe</h1>
+    <h1>Array.observe(O, callback, options = undefined</h1>
 
-    <p>A new function Array.observe(O, callback) is added, which is equivalent to</p>
+    <p>A new function Array.observe is added, which is equivalent to</p>
+    <!-- TODO(arv): Use a real spec algorithm here. Refactor Object.observe into
+    a new spec algorithm that is shared between these two. -->
 
     <pre>
-function(O, callback) {
-  return Object.observe(O, callback, ["add", "update", "delete", "splice"]);
+function(O, callback,
+    {accept = ["add", "update", "delete", "splice"], skip = false} = {}) {
+  return Object.observe(O, callback, {
+    acceptTypes: accept,
+    skipRecords: skip
+  });
 }
     </pre>
   </emu-clause>
-  
+
   <emu-clause id="Array.unobserve">
     <h1>Array.unobserve</h1>
 
@@ -101,3 +109,4 @@ function(O, callback) {
     </emu-alg>
   </emu-clause>
 </emu-clause>
+

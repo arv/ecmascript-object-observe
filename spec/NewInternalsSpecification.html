@@ -161,6 +161,7 @@
     <h1>EnqueueChangeRecord(O, changeRecord)</h1>
 
     <p>When the abstract operation EnqueueChangeRecord is called with Object _O_ and change record _changeRecord_ the following steps are taken:</p>
+
     <emu-alg>
       1. Assert: Type(_O_) is Object.
       1. Let _notifier_ be GetNotifier(_O_).
@@ -169,12 +170,9 @@
       1. Let _activeChanges_ be the value of _notfier_'s [[ActiveChanges]] internal slot.
       1. Let _changeObservers_ be the value of _notifier_'s [[ChangeObservers]] internal slot.
       1. For each _observerRecord_ in _changeObservers_, do
-        1. Let _acceptList_ be Get(_observerRecord_, `"accept"`).
-        1. ReturnIfAbrupt(_acceptList_).
-        1. Let _deliver_ be ShouldDeliverToObserver(_activeChanges_, _acceptList_, _changeType_).
+        1. Let _deliver_ be ShouldDeliverToObserver(_activeChanges_, _observerRecord_.[[Accept]], _changeType_).
         1. If _deliver_ is *false*, continue.
-        1. Otherwise, let _observer_ be Get(_observerRecord_, `"callback"`).
-        1. ReturnIfAbrupt(_observer_).
+        1. Otherwise, let _observer_ be _observerRecord_.[[Callback]].
         1. Let _pendingRecords_ be the value of _observer_'s [[PendingChangeRecords]] internal slot.
         1. Append _changeRecord_ to the end of _pendingRecords_.
     </emu-alg>
@@ -192,12 +190,12 @@
       1. Let _array_ be ArrayCreate(0).
       1. Let _n_ be 0.
       1. For each _record_ in _changeRecords_, do:
-        1. Let _status_ be the result of CreateDataProperty(_array_, ToString(_n_), _record).
+        1. Let _status_ be the result of CreateDataProperty(_array_, ToString(_n_), _record_).
         1. Assert: _status_ is *true*.
         1. Increment _n_ by 1.
       1. If _array_ is empty, return *false*.
       1. Let _status_ be Call(_C_, *undefined*, «_array_»).
-      1. _result_ is intentionall ignored here since. An implementation might choose to log abrubt completions here.
+      1. _result_ is intentionally ignored here since. An implementation might choose to log abrupt completions here.
       1. Return *true*.
     </emu-alg>
 
