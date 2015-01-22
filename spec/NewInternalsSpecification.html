@@ -205,17 +205,13 @@
   </emu-clause>
 
   <emu-clause id="DeliverAllChangeRecords" aoid>
-    <h1>[[DeliverAllChangeRecords]]</h1>
-    <p>There is an abstract [[DeliverAllChangeRecords]] internal algorithm:</p>
-
-    <p>?.??.?? [[DeliverAllChangeRecords]]</p>
-
-    <p>When the [[DeliverAllChangeRecords]] internal algorithm is called, the following steps are taken:</p>
+    <h1>DeliverAllChangeRecords()</h1>
+    <p>When the abstract operation DeliverAllChangeRecords is called, the following steps are taken:</p>
     <emu-alg>
       1. Let _observers_ be the result of getting [[ObserverCallbacks]]
       1. Let _anyWorkDone_ be false.
       1. For each _observer_ in _observers_, do:
-        1. Let _result_ be the result of calling [[DeliverChangeRecords]] with _observer_.
+        1. Let _result_ be DeliverChangeRecords(_observer_).
         1. If _result_ is *true*, set _anyWorkDone_ to *true*.
       1. Return _anyWorkDone_.
     </emu-alg>
