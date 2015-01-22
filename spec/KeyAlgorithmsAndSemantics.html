@@ -6,7 +6,7 @@
     <p>Conceptually, at the heart of the EMCAScript observation mechanism is two structures:</p>
     <ul>
       <li><a href="#ChangeObservers">ChangeObservers</a>: the set of functions which are presently registered as observers of changes which take place to given object.
-      <li><a href="#PendingChangeRecords">PendingChangeRecords</a>: the sequence of change records which have been enqueued for delivery to the an observer, but not yet delivered.
+      <li><a href="#PendingChangeRecords">PendingChangeRecords</a>: the sequence of change records which have been enqueued for delivery to an observer, but not yet delivered.
     </ul>
     <p><a href="#Object.observe">Object.observe</a> enters a function into an object's associated set of ChangeObservers (while <a href="#Object.unobserve">Object.unobserve</a> removes it).</p>
 
@@ -27,7 +27,7 @@
       <li>When certain <a href="#changes_to_array_methods">mutations to Arrays</a> take place which may affect multiple index properties, observers may receive "splice" change records.
       <li>The <a href="#notifierprototype_.notify">notify()</a> method of an object's associated <a href="#notifier">Notifier</a> may be used to cause observers to receive custom ("synthetic") change records.
     </ul>
-    <p>Change records are enqueued to observers via the internal <a href="#enqueuechangerecord">EnqueueChangeRecord</a> algorithm.</p>
+    <p>Change records are enqueued to observers via the internal <a href="#EnqueueChangeRecord">EnqueueChangeRecord</a> algorithm.</p>
   </emu-clause>
   
   <emu-clause id="the-notifier-object">
@@ -40,7 +40,7 @@
   <emu-clause id="accepted-change-types">
     <h1>Accepted Change Types</h1>
 
-    <p>An observer must only receive change records whose type matches one provided in the accept list, which is passed as the (optional) third argument to <a href="#object.observe">Object.observe</a> (if the argument is not provided, the list defaults to the "intrinsic" set of change types).</p>
+    <p>An observer must only receive change records whose type matches one provided in the accept list, which is passed as the (optional) third argument to <a href="#Object.observe">Object.observe</a> (if the argument is not provided, the list defaults to the "intrinsic" set of change types).</p>
 
     <p>An observation is conceptually a tuple: &lt;observed object, observer function, accepted change types&gt;. Object.observe ensures that this tuple is represented as an observerRecord in the associated Notifier's ChangeObservers list.</p>
   </emu-clause>
@@ -50,22 +50,22 @@
 
     <p>The <a href="#notifierprototype_.performchange">performChange()</a> method of an object's associated Notifier provides a mechanism to describe a set of changes as a single (more compact) higher-level change type.</p>
 
-    <p>The set of change types being performed on an object is represented in the set of properties of the Notifier's <a href="#beginchange">BeginChange</a> before, and <a href="#endchange">EndChange</a> after invoking the provided changeFn function.</p>
+    <p>The set of change types being performed on an object is represented in the set of properties of the Notifier's <a href="#BeginChange">BeginChange</a> before, and <a href="#EndChange">EndChange</a> after invoking the provided changeFn function.</p>
   </emu-clause>
 
   <emu-clause id="enqueuing-changes-to-observers">
     <h1>Enqueuing changes to observers</h1>
 
-    <p>When a change is to be enqueued to an object's associated observers, the internal <a href="#enqueuechangerecord">EnqueueChangeRecord</a> algorithm tests whether each observer should receive the change by invoking <a href="#shoulddelivertoobserver">ShouldDeliverToObserver</a>.</p>
+    <p>When a change is to be enqueued to an object's associated observers, the internal <a href="#EnqueueChangeRecord">EnqueueChangeRecord</a> algorithm tests whether each observer should receive the change by invoking <a href="#ShouldDeliverToObserver">ShouldDeliverToObserver</a>.</p>
 
     <p>ShouldDeliverToObserver returns true IFF an observer accepts the candidate change record's type, but accepts none of the change types currently being performed on the object (as represented in the ActiveChanges).</p>
   </emu-clause>
   <emu-clause id="end-of-turn-delivery-of-change-records">
     <h1>End of turn delivery of change records</h1>
-    <p>At the end of the current processing turn (or "Microtask"), <a href="#deliverallchangerecords">DeliverAllChangeRecords</a> is invoked, which continuously delivers pending change records to observers until there are none remaining.</p>
+    <p>At the end of the current processing turn (or "Microtask"), <a href="#DeliverAllChangeRecords">DeliverAllChangeRecords</a> is invoked, which continuously delivers pending change records to observers until there are none remaining.</p>
 
-    <p>The order in which observers are delivered to is maintained in the <a href="#observercallbacks">ObserverCallbacks</a> list. The first time a function is used as an observer by provided it as an argument to Object.observe, it is appended to the end of ObserverCallbacks.</p>
+    <p>The order in which observers are delivered to is maintained in the <a href="#ObserverCallbacks">ObserverCallbacks</a> list. The first time a function is used as an observer by provided it as an argument to Object.observe, it is appended to the end of ObserverCallbacks.</p>
 
-    <p>Delivery takes place by repeatedly iterating front-to-back through ObserverCallbacks, <a href="#deliverchangerecords">delivering</a> to any observer who has pending change records, until no observer have pending change records.</p>
+    <p>Delivery takes place by repeatedly iterating front-to-back through ObserverCallbacks, <a href="#DeliverChangeRecords">delivering</a> to any observer who has pending change records, until no observer have pending change records.</p>
   </emu-clause>
 </emu-clause>

@@ -174,10 +174,12 @@
         1. If _deliver_ is *false*, continue.
         1. Otherwise, let _observer_ be _observerRecord_.[[Callback]].
         1. Let _pendingRecords_ be the value of _observer_'s [[PendingChangeRecords]] internal slot.
-        1. Append _changeRecord_ to the end of _pendingRecords_.
+        1. If _observerRecord_.[[Skip]] is *false*, then
+          1. Append *undefined* to the end of _pendingRecords_.
+        1. Else,
+          1. Append _changeRecord_ to the end of _pendingRecords_.
     </emu-alg>
   </emu-clause>
-
 
   <emu-clause id="DeliverChangeRecords" aoid>
     <h1>DeliverChangeRecords(C)</h1>
@@ -189,13 +191,22 @@
       1. Set _C_'s [[PendingChangeRecords]] internal slot to a new empty List.
       1. Let _array_ be ArrayCreate(0).
       1. Let _n_ be 0.
+      1. Let _anyFound_ be *false*.
+      1. Let _anyRecords_ be *false*.
       1. For each _record_ in _changeRecords_, do:
+        1. Let _anyFound_ be *true*.
+        1. If _record_ is *undefined*, continue.
+        1. Let _anyRecords_ be *true*.
         1. Let _status_ be the result of CreateDataProperty(_array_, ToString(_n_), _record_).
         1. Assert: _status_ is *true*.
         1. Increment _n_ by 1.
-      1. If _array_ is empty, return *false*.
-      1. Let _status_ be Call(_C_, *undefined*, «_array_»).
-      1. _result_ is intentionally ignored here since. An implementation might choose to log abrupt completions here.
+      1. If _anyFound_ is *false*, return *false*.
+      1. If _anyRecords_ is *true*, then:
+        1. Let _arg_ be _array_.
+      1. Else,
+        1. Let _arg_ be *undefined*.
+      1. Let _status_ be Call(_C_, *undefined*, «_arg_»).
+      1. _result_ is intentionally ignored here. An implementation might choose to log abrupt completions here.
       1. Return *true*.
     </emu-alg>
 
