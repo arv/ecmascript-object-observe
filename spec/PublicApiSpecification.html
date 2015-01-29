@@ -62,7 +62,7 @@
 
     <p>A new function Array.observe is added, which is equivalent to. <ins>TODO(arv) Use a real spec algorithm here. Refactor Object.observe into a new spec algorithm that is shared between these two.</ins></p>
 
-    <pre>
+    <pre><code class="language-javascript">
 function(O, callback,
     {accept = ["add", "update", "delete", "splice"], skip = false} = {}) {
   return Object.observe(O, callback, {
@@ -70,7 +70,7 @@ function(O, callback,
     skipRecords: skip
   });
 }
-    </pre>
+    </code></pre>
   </emu-clause>
 
   <emu-clause id="Array.unobserve">
@@ -78,11 +78,11 @@ function(O, callback,
 
     <p>A new function Array.unobserve(o, callback) is added, which is equivalent to</p>
 
-    <pre>
+    <pre><code class="language-javascript">
 function(O, callback) {
   return Object.unobserve(O, callback);
 }
-    </pre>
+    </code></pre>
   </emu-clause>
 
   <emu-clause id="Object.deliverChangeRecords">
