@@ -3,7 +3,7 @@
 
   <emu-clause id="ChangeObserver-and-PendingChangeRecords">
     <h1>ChangeObserver and PendingChangeRecords</h1>
-    <p>Conceptually, at the heart of the EMCAScript observation mechanism is two structures:</p>
+    <p>Conceptually, at the heart of the EMCAScript observation mechanism are two structures:</p>
     <ul>
       <li><a href="#ChangeObservers">ChangeObservers</a>: the set of functions which are presently registered as observers of changes which take place to given object.
       <li><a href="#PendingChangeRecords">PendingChangeRecords</a>: the sequence of change records which have been enqueued for delivery to an observer, but not yet delivered.
@@ -64,7 +64,7 @@
     <h1>End of turn delivery of change records</h1>
     <p>At the end of the current processing turn (or "Microtask"), <a href="#DeliverAllChangeRecords">DeliverAllChangeRecords</a> is invoked, which continuously delivers pending change records to observers until there are none remaining.</p>
 
-    <p>The order in which observers are delivered to is maintained in the <a href="#ObserverCallbacks">ObserverCallbacks</a> list. The first time a function is used as an observer by provided it as an argument to Object.observe, it is appended to the end of ObserverCallbacks.</p>
+    <p>The order in which observers are delivered to is maintained in the <a href="#ObserverCallbacks">ObserverCallbacks</a> list. The first time a function is used as an observer by providing it as an argument to Object.observe, it is appended to the end of ObserverCallbacks.</p>
 
     <p>Delivery takes place by repeatedly iterating front-to-back through ObserverCallbacks, <a href="#DeliverChangeRecords">delivering</a> to any observer who has pending change records, until no observer have pending change records.</p>
   </emu-clause>
