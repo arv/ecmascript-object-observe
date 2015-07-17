@@ -9,6 +9,10 @@ mkdir out;
 ecmarkup spec/index.html out/index.html
 cp css/elements.css out/elements.css
 
+# stop if this is a PR from a fork, since Travis disables
+# secure environment variables in that case
+test -z "${GH_TOKEN}" && exit 0;
+
 # go to the out directory and create a *new* Git repo
 cd out
 git init
