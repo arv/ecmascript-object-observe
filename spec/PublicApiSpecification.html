@@ -90,7 +90,7 @@ function(O, callback) {
 
     <p>When the `deliverChangeRecords` method is called with argument _callback_, the following steps are taken:</p>
     <emu-alg>
-      1. If IsCallable(_callback_) is *true*, throw a *TypeError* exception.
+      1. If IsCallable(_callback_) is *false*, throw a *TypeError* exception.
       1. Repeat
         1. Let _result_ be DeliverChangeRecords(_callback_).
         1. If _result_ is *false* return.
